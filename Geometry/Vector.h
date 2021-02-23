@@ -1,173 +1,110 @@
 #pragma once
 #include "Matrix.h"
 
-template <typename T> class Vector4
+class Vector4
 {
-private:
-	T vector[4];
-
+	
 public:
-	Vector4(T x, T y, T z, T w);
+	float vector[4];
 
-	Vector4(T vector[4]);
+	Vector4(float x, float y, float z, float w);
 
-	Vector4<T> operator +(Vector4<T> other);
+	Vector4(float vector[4]);
 
-	Vector4<T> operator -(Vector4<T> other);
+	Vector4 operator +(Vector4 other);
 
-	Vector4<T> operator *(Vector4<T> other);
+	Vector4 operator -(Vector4 other);
 
-	Vector4<T> operator *(Matrix4<T> other);
+	Vector4 operator *(Vector4 other);
 
-	static T dot(Vector4<T> a, Vector4<T> b);
+	Vector4 operator *(Matrix4 other);
 
-	T& operator[] (const int index);
+	static float dot(Vector4 a, Vector4 b);
+
+	float& operator[] (const int index);
 
 	void show();
 
 	void normalize();
 
-	T length();
+	float length();
 
-	friend Vector4<T> operator *(Vector4<T> vec, T right)
-	{
-		return Vector4<T>(
-			vec[0] * right,
-			vec[1] * right,
-			vec[2] * right,
-			vec[3] * right
-			);
-	}
+	friend Vector4 operator *(Vector4 vec, float right);
 
-	friend Vector4<T> operator *(T left, Vector4<T> vec)
-	{
-		return Vector4<T>(
-			vec[0] * left,
-			vec[1] * left,
-			vec[2] * left,
-			vec[3] * left
-			);
-	}
+	friend Vector4 operator *(float left, Vector4 vec);
 
-	friend Vector4<T> operator /(Vector4<T> vec, T right)
-	{
-		return Vector4<T>(
-			vec[0] / right,
-			vec[1] / right,
-			vec[2] / right,
-			vec[3] / right
-			);
-	}
+	friend Vector4 operator /(Vector4 vec, float right);
 
 };
 
-template <typename T> class Vector3
+class Vector3
 {
-private:
-	T vector[3];
 
 public:
-	Vector3(T x, T y, T z);
+	float vector[3];
 
-	Vector3(T vector[3]);
+	Vector3(float x, float y, float z);
 
-	Vector3<T> operator +(Vector3<T> other);
+	Vector3(float vector[3]);
 
-	Vector3<T> operator -(Vector3<T> other);
+	Vector3 operator +(Vector3 other);
 
-	Vector3<T> operator *(Vector3<T> other);
+	Vector3 operator -(Vector3 other);
 
-	Vector3<T> operator *(Matrix3<T> other);
+	Vector3 operator *(Vector3 other);
 
-	static T dot(Vector3<T> a, Vector3<T> b);
+	Vector3 operator *(Matrix3 other);
 
-	T& operator[] (const int index);
+	static float dot(Vector3 a, Vector3 b);
+
+	float& operator[] (const int index);
 
 	void show();
 
 	void normalize();
 
-	T length();
+	float length();
 
-	friend Vector3<T> operator *(Vector3<T> vec, T right)
-	{
-		return Vector3<T>(
-			vec[0] * right,
-			vec[1] * right,
-			vec[2] * right
-			);
-	}
+	friend Vector3 operator *(Vector3 vec, float right);
 
-	friend Vector3<T> operator *(T left, Vector3<T> vec)
-	{
-		return Vector3<T>(
-			vec[0] * left,
-			vec[1] * left,
-			vec[2] * left
-		);
-	}
+	friend Vector3 operator *(float left, Vector3 vec);
 
-	friend Vector3<T> operator /(Vector3<T> vec, T right)
-	{
-		return Vector3<T>(
-			vec[0] / right,
-			vec[1] / right,
-			vec[2] / right
-		);
-	}
+	friend Vector3 operator /(Vector3 vec, float right);
 
 };
 
-template <typename T> class Vector2
+class Vector2
 {
-private:
-	T vector[2];
 
 public:
-	Vector2(T x, T y);
+	float vector[2];
 
-	Vector2(T vector[2]);
+	Vector2(float x, float y);
 
-	Vector2<T> operator +(Vector2<T> other);
+	Vector2(float vector[2]);
 
-	Vector2<T> operator -(Vector2<T> other);
+	Vector2 operator +(Vector2 other);
 
-	Vector2<T> operator *(Vector2<T> other);
+	Vector2 operator -(Vector2 other);
 
-	Vector2<T> operator *(Matrix2<T> other);
+	Vector2 operator *(Vector2 other);
 
-	static T dot(Vector2<T> a, Vector2<T> b);
+	Vector2 operator *(Matrix2 other);
 
-	T& operator[] (const int index);
+	static float dot(Vector2 a, Vector2 b);
+
+	float& operator[] (const int index);
 
 	void show();
 
 	void normalize();
 
-	T length();
+	float length();
 
-	friend Vector2<T> operator *(Vector2<T> vec, T right)
-	{
-		return Vector2<T>(
-			vec[0] * right,
-			vec[1] * right
-			);
-	}
+	friend Vector2 operator *(Vector2 vec, float right);
 
-	friend Vector2<T> operator *(T left, Vector2<T> vec)
-	{
-		return Vector2<T>(
-			vec[0] * left,
-			vec[1] * left
-			);
-	}
+	friend Vector2 operator *(float left, Vector2 vec);
 
-	friend Vector2<T> operator /(Vector2<T> vec, T right)
-	{
-		return Vector2<T>(
-			vec[0] / right,
-			vec[1] / right
-			);
-	}
+	friend Vector2 operator /(Vector2 vec, float right);
 
 };

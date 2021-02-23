@@ -1,9 +1,9 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <chrono>
 #include "Matrix.h"
 #include "Vector.h"
-#include <chrono>
 
 using namespace std;
 
@@ -219,15 +219,20 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    const GLfloat mvp[] =
+    Matrix4 S = createScaleMatrix(0.25, 0.25, 0.25);
+    Matrix4 T = createTranslateMatrix(0.0, 0.0, 0.0);
+    Matrix4 R1 = createRotateMatrix(0.0, 1.0, 0.0, 60.0);
+    Matrix4 R2 = createRotateMatrix(1.0, 0.0, 0.0, 30.0);
+
+    /*const GLfloat mvp[] =
     {
         1.708748f, -1.478188f, -0.360884f, -0.353738f,
         0.000000f, 1.208897f, -0.883250f, -0.865760f,
         -1.707388f, -1.479366f, -0.361171f, -0.354019f,
         0.000000f, 0.000000f, 4.898990f, 5.000000f
-    };
+    };*/
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, mvp);
+    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, (S * T * R1).matrix);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }

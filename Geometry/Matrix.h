@@ -1,167 +1,95 @@
 #pragma once
 
-template <typename T> class Matrix4
+class Matrix4
 {
-private:
-	T matrix[16];
-
 public:
-	Matrix4(T matrix[16]);
+	float matrix[16];
 
-	Matrix4(T a11, T a12, T a13, T a14, T a21, T a22, T a23, T a24, T a31, T a32, T a33, T a34, T a41, T a42, T a43, T a44);
+	Matrix4(float matrix[16]);
 
-	Matrix4<T> operator +(Matrix4<T> other);
+	Matrix4(float a11, float a12, float a13, float a14, 
+		float a21, float a22, float a23, float a24, 
+		float a31, float a32, float a33, float a34, 
+		float a41, float a42, float a43, float a44);
 
-	Matrix4<T> operator -(Matrix4<T> other);
+	Matrix4 operator +(Matrix4 other);
 
-	Matrix4<T> operator *(Matrix4<T> other);
+	Matrix4 operator -(Matrix4 other);
 
-	T& operator[] (const int index);
+	Matrix4 operator *(Matrix4 other);
+
+	float& operator[] (const int index);
 
 	void show();
 
-	friend Matrix4<T> operator *(Matrix4<T> mat, T right)
-	{
-		T result[16];
+	friend Matrix4 operator *(Matrix4 mat, float right);
 
-		for (int i = 0; i < 16; i++)
-			result[i] = mat[i] * right;
+	friend Matrix4 operator *(float left, Matrix4 mat);
 
-		return Matrix4<T>(result);
-	}
-
-	friend Matrix4<T> operator *(T left, Matrix4<T> mat)
-	{
-		T result[16];
-
-		for (int i = 0; i < 16; i++)
-			result[i] = mat[i] * left;
-
-		return Matrix4<T>(result);
-	}
-
-	friend Matrix4<T> operator /(Matrix4<T> mat, T right)
-	{
-		T result[16];
-
-		for (int i = 0; i < 16; i++)
-			result[i] = mat[i] / right;
-
-		return Matrix4<T>(result);
-	}
+	friend Matrix4 operator /(Matrix4 mat, float right);
 
 };
 
-template <typename T> class Matrix3
+class Matrix3
 {
-private:
-	T matrix[9];
-
 public:
-	Matrix3(T matrix[9]);
+	float matrix[9];
 
-	Matrix3(T a11, T a12, T a13, T a21, T a22, T a23, T a31, T a32, T a33);
+	Matrix3(float matrix[9]);
 
-	Matrix3<T> operator +(Matrix3<T> other);
+	Matrix3(float a11, float a12, float a13, float a21, float a22, float a23, float a31, float a32, float a33);
 
-	Matrix3<T> operator -(Matrix3<T> other);
+	Matrix3 operator +(Matrix3 other);
 
-	Matrix3<T> operator *(Matrix3<T> other);
+	Matrix3 operator -(Matrix3 other);
 
-	T& operator[] (const int index);
+	Matrix3 operator *(Matrix3 other);
+
+	float& operator[] (const int index);
 
 	void show();
 
-	friend Matrix3<T> operator *(Matrix3<T> mat, T right)
-	{
-		T result[9];
+	friend Matrix3 operator *(Matrix3 mat, float right);
 
-		for (int i = 0; i < 9; i++)
-			result[i] = mat[i] * right;
+	friend Matrix3 operator *(float left, Matrix3 mat);
 
-		return Matrix3<T>(result);
-	}
-
-	friend Matrix3<T> operator *(T left, Matrix3<T> mat)
-	{
-		T result[9];
-
-		for (int i = 0; i < 9; i++)
-			result[i] = mat[i] * left;
-
-		return Matrix3<T>(result);
-	}
-
-	friend Matrix3<T> operator /(Matrix3<T> mat, T right)
-	{
-		T result[9];
-
-		for (int i = 0; i < 9; i++)
-			result[i] = mat[i] / right;
-
-		return Matrix3<T>(result);
-	}
+	friend Matrix3 operator /(Matrix3 mat, float right);
 
 };
 
-template <typename T> class Matrix2
+class Matrix2
 {
-private:
-	T matrix[4];
-
 public:
-	Matrix2(T matrix[4]);
+	float matrix[4];
 
-	Matrix2(T a11, T a12, T a21, T a22);
+	Matrix2(float matrix[4]);
 
-	Matrix2<T> operator +(Matrix2<T> other);
+	Matrix2(float a11, float a12, float a21, float a22);
 
-	Matrix2<T> operator -(Matrix2<T> other);
+	Matrix2 operator +(Matrix2 other);
 
-	Matrix2<T> operator *(Matrix2<T> other);
+	Matrix2 operator -(Matrix2 other);
 
-	T& operator[] (const int index);
+	Matrix2 operator *(Matrix2 other);
+
+	float& operator[] (const int index);
 
 	void show();
 
-	friend Matrix2<T> operator *(Matrix2<T> mat, T right)
-	{
-		T result[4];
+	friend Matrix2 operator *(Matrix2 mat, float right);
 
-		for (int i = 0; i < 4; i++)
-			result[i] = mat[i] * right;
+	friend Matrix2 operator *(float left, Matrix2 mat);
 
-		return Matrix2<T>(result);
-	}
-
-	friend Matrix2<T> operator *(T left, Matrix2<T> mat)
-	{
-		T result[4];
-
-		for (int i = 0; i < 4; i++)
-			result[i] = mat[i] * left;
-
-		return Matrix2<T>(result);
-	}
-
-	friend Matrix2<T> operator /(Matrix2<T> mat, T right)
-	{
-		T result[4];
-
-		for (int i = 0; i < 4; i++)
-			result[i] = mat[i] / right;
-
-		return Matrix2<T>(result);
-	}
+	friend Matrix2 operator /(Matrix2 mat, float right);
 
 };
 
-template <typename T> Matrix4<T> createTranslateMatrix(T x, T y, T z);
+Matrix4 createTranslateMatrix(float x, float y, float z);
 
-template <typename T> Matrix4<T> createScaleMatrix(T sx, T sy, T sz);
+Matrix4 createScaleMatrix(float sx, float sy, float sz);
 
-template <typename T> Matrix4<T> createRotateMatrix(T x, T y, T z, float angle_rad);
+Matrix4 createRotateMatrix(float x, float y, float z, float angle);
 
-template <typename T> Matrix4<T> createPerspectiveProjectionMatrix(T far, T near, T angle_rad, int screen_width, int screen_height);
+Matrix4 createPerspectiveProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height);
 
-template <typename T> Matrix4<T> createParallelProjectionMatrix(T far, T near, T angle_rad, int screen_width, int screen_height);
+Matrix4 createParallelProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height);
