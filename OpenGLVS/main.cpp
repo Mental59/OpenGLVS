@@ -89,7 +89,6 @@ bool createShaderProgram()
     "#version 330\n"
     ""
     "layout(location = 0) in vec3 a_position;"
-    "layout(location = 1) in vec3 a_color;"
     ""
     "uniform mat4 u_mvp;"
     ""
@@ -97,7 +96,6 @@ bool createShaderProgram()
     ""
     "void main()"
     "{"
-    "    v_color = a_color;"
     "    gl_Position = u_mvp * vec4(a_position, 1.0);"
     "}"
     ;
@@ -105,12 +103,11 @@ bool createShaderProgram()
     const GLchar fsh[] =
     "#version 330\n"
     ""
-    "in vec3 v_color;"
-    ""
     "layout(location = 0) out vec4 o_color;"
     ""
     "void main()"
     "{"
+    "   vec3 v_color = vec3(1.0, 0.0, 0.0);"
     "   o_color = vec4(v_color, 1.0);"
     "}"
     ;
@@ -134,35 +131,35 @@ bool createModel()
 {
     const GLfloat vertices[] =
     {
-        -1.0, -1.0, 1.0, 1.0, 0.0, 0.0,
-        1.0, -1.0, 1.0, 1.0, 0.0, 0.0,
-        1.0, 1.0, 1.0, 1.0, 0.0, 0.0,
-        -1.0, 1.0, 1.0, 1.0, 0.0, 0.0,
+        -1.0, -1.0, 1.0,
+        1.0, -1.0, 1.0,
+        1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
 
-        1.0, -1.0, 1.0, 1.0, 1.0, 0.0,
-        1.0, -1.0, -1.0, 1.0, 1.0, 0.0,
-        1.0, 1.0, -1.0, 1.0, 1.0, 0.0,
-        1.0, 1.0, 1.0, 1.0, 1.0, 0.0,
+        1.0, -1.0, 1.0,
+        1.0, -1.0, -1.0,
+        1.0, 1.0, -1.0,
+        1.0, 1.0, 1.0,
 
-        1.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-        1.0, 1.0, -1.0, 1.0, 0.0, 1.0,
-        -1.0, 1.0, -1.0, 1.0, 0.0, 1.0,
-        -1.0, 1.0, 1.0, 1.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, -1.0,
+        -1.0, 1.0, -1.0,
+        -1.0, 1.0, 1.0,
 
-        -1.0, 1.0, 1.0, 0.0, 1.0, 1.0,
-        -1.0, 1.0, -1.0, 0.0, 1.0, 1.0,
-        -1.0, -1.0, -1.0, 0.0, 1.0, 1.0,
-        -1.0, -1.0, 1.0, 0.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        -1.0, 1.0, -1.0,
+        -1.0, -1.0, -1.0,
+        -1.0, -1.0, 1.0,
 
-        -1.0, -1.0, 1.0, 0.0, 1.0, 0.0,
-        -1.0, -1.0, -1.0, 0.0, 1.0, 0.0,
-        1.0, -1.0, -1.0, 0.0, 1.0, 0.0,
-        1.0, -1.0, 1.0, 0.0, 1.0, 0.0,
+        -1.0, -1.0, 1.0,
+        -1.0, -1.0, -1.0,
+        1.0, -1.0, -1.0,
+        1.0, -1.0, 1.0,
 
-        -1.0, -1.0, -1.0, 0.0, 0.0, 1.0,
-        -1.0, 1.0, -1.0, 0.0, 0.0, 1.0,
-        1.0, 1.0, -1.0, 0.0, 0.0, 1.0,
-        1.0, -1.0, -1.0, 0.0, 0.0, 1.0,
+        -1.0, -1.0, -1.0,
+        -1.0, 1.0, -1.0,
+        1.0, 1.0, -1.0,
+        1.0, -1.0, -1.0,
     };
 
     const GLuint indices[] =
@@ -189,9 +186,7 @@ bool createModel()
     g_model.indexCount = 6 * 6;
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const GLvoid *)0);
 
     return g_model.vbo != 0 && g_model.ibo != 0 && g_model.vao != 0;
 }
