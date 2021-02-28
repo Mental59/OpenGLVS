@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector.h"
 
 class Matrix4
 {
@@ -18,7 +19,11 @@ public:
 
 	Matrix4 operator *(Matrix4 other);
 
+	Vector4 operator *(Vector4 other);
+
 	float& operator[] (const int index);
+	
+	Matrix4& operator =(const Matrix4& other);
 
 	void show();
 
@@ -45,7 +50,11 @@ public:
 
 	Matrix3 operator *(Matrix3 other);
 
+	Vector3 operator *(Vector3 other);
+
 	float& operator[] (const int index);
+
+	Matrix3& operator =(const Matrix3& other);
 
 	void show();
 
@@ -72,7 +81,11 @@ public:
 
 	Matrix2 operator *(Matrix2 other);
 
+	Vector2 operator *(Vector2 other);
+
 	float& operator[] (const int index);
+
+	Matrix2& operator =(const Matrix2& other);
 
 	void show();
 

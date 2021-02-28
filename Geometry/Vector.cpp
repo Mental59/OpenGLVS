@@ -56,19 +56,6 @@ Vector4 Vector4::operator *(Vector4 other)
 		);
 }
 
-Vector4 Vector4::operator *(Matrix4 other)
-{
-	float vec[4];
-
-	for (int i = 0; i < 4; i++)
-		vec[i] = this->vector[0] * other[i] +
-		this->vector[1] * other[i + 4] +
-		this->vector[2] * other[i + 8] +
-		this->vector[3] * other[i + 12];
-
-	return Vector4(vec);
-}
-
 float Vector4::dot(Vector4 a, Vector4 b)
 {
 	Vector4 p = a * b;
@@ -183,18 +170,6 @@ Vector3 Vector3::operator *(Vector3 other)
 		);
 }
 
-Vector3 Vector3::operator *(Matrix3 other)
-{
-	float vec[3];
-
-	for (int i = 0; i < 3; i++)
-		vec[i] = this->vector[0] * other[i] +
-		this->vector[1] * other[i + 3] +
-		this->vector[2] * other[i + 6];
-
-	return Vector3(vec);
-}
-
 float Vector3::dot(Vector3 a, Vector3 b)
 {
 	Vector3 p = a * b;
@@ -299,17 +274,6 @@ Vector2 Vector2::operator *(Vector2 other)
 		this->vector[0] * other[0],
 		this->vector[1] * other[1]
 		);
-}
-
-Vector2 Vector2::operator *(Matrix2 other)
-{
-	float vec[2];
-
-	for (int i = 0; i < 2; i++)
-		vec[i] = this->vector[0] * other[i] +
-		this->vector[1] * other[i + 2];
-
-	return Vector2(vec);
 }
 
 float Vector2::dot(Vector2 a, Vector2 b)

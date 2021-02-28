@@ -84,9 +84,30 @@ Matrix4 Matrix4::operator *(Matrix4 other)
 	return Matrix4(result);
 }
 
+Vector4 Matrix4::operator *(Vector4 other)
+{
+	float vec[4];
+
+	for (int i = 0; i < 4; i++)
+		vec[i] = other[0] * this->matrix[i] +
+		other[1] * this->matrix[i + 4] +
+		other[2] * this->matrix[i + 8] +
+		other[3] * this->matrix[i + 12];
+
+	return Vector4(vec);
+}
+
 float& Matrix4::operator[] (const int index)
 {
 	return this->matrix[index];
+}
+
+Matrix4& Matrix4::operator =(const Matrix4& other)
+{
+	for (int i = 0; i < 16; i++)
+		this->matrix[i] = other.matrix[i];
+	
+	return *this;
 }
 
 Matrix4 operator *(Matrix4 mat, float right)
@@ -192,9 +213,29 @@ Matrix3 Matrix3::operator *(Matrix3 other)
 	return Matrix3(result);
 }
 
+Vector3 Matrix3::operator *(Vector3 other)
+{
+	float vec[3];
+
+	for (int i = 0; i < 3; i++)
+		vec[i] = other[0] * this->matrix[i] +
+		other[1] * this->matrix[i + 3] +
+		other[2] * this->matrix[i + 6];
+
+	return Vector3(vec);
+}
+
 float& Matrix3::operator[] (const int index)
 {
 	return this->matrix[index];
+}
+
+Matrix3& Matrix3::operator =(const Matrix3& other)
+{
+	for (int i = 0; i < 9; i++)
+		this->matrix[i] = other.matrix[i];
+
+	return *this;
 }
 
 Matrix3 operator *(Matrix3 mat, float right)
@@ -291,9 +332,28 @@ Matrix2 Matrix2::operator *(Matrix2 other)
 	return Matrix2(result);
 }
 
+Vector2 Matrix2::operator *(Vector2 other)
+{
+	float vec[2];
+
+	for (int i = 0; i < 2; i++)
+		vec[i] = other[0] * this->matrix[i] +
+		other[1] * this->matrix[i + 2];
+
+	return Vector2(vec);
+}
+
 float& Matrix2::operator[] (const int index)
 {
 	return this->matrix[index];
+}
+
+Matrix2& Matrix2::operator =(const Matrix2& other)
+{
+	for (int i = 0; i < 4; i++)
+		this->matrix[i] = other.matrix[i];
+
+	return *this;
 }
 
 Matrix2 operator *(Matrix2 mat, float right)

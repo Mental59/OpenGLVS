@@ -1,5 +1,4 @@
 #pragma once
-#include "Matrix.h"
 
 class Vector4
 {
@@ -16,8 +15,6 @@ public:
 	Vector4 operator -(Vector4 other);
 
 	Vector4 operator *(Vector4 other);
-
-	Vector4 operator *(Matrix4 other);
 
 	static float dot(Vector4 a, Vector4 b);
 
@@ -53,8 +50,6 @@ public:
 
 	Vector3 operator *(Vector3 other);
 
-	Vector3 operator *(Matrix3 other);
-
 	static float dot(Vector3 a, Vector3 b);
 
 	float& operator[] (const int index);
@@ -88,8 +83,6 @@ public:
 	Vector2 operator -(Vector2 other);
 
 	Vector2 operator *(Vector2 other);
-
-	Vector2 operator *(Matrix2 other);
 
 	static float dot(Vector2 a, Vector2 b);
 

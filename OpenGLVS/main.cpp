@@ -219,10 +219,12 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    Matrix4 S = createScaleMatrix(0.25, 0.25, 0.25);
-    Matrix4 T = createTranslateMatrix(0.0, 0.0, 0.0);
-    Matrix4 R1 = createRotateMatrix(0.0, 1.0, 0.0, 60.0);
-    Matrix4 R2 = createRotateMatrix(1.0, 0.0, 0.0, 30.0);
+    Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
+    Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
+    Matrix4 R1 = createRotateMatrix(0.0f, 1.0f, 0.0f, 60.0f);
+    Matrix4 R2 = createRotateMatrix(1.0f, 0.0f, 0.0f, 30.0f);
+    Matrix4 MV =  S * T * R1 * R2;
+    Matrix4 P = createPerspectiveProjectionMatrix(1000.0f, 0.01f, 40.0f, 800, 600);
 
     /*const GLfloat mvp[] =
     {
@@ -232,7 +234,7 @@ void draw(double delta)
         0.000000f, 0.000000f, 4.898990f, 5.000000f
     };*/
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, (S * T * R1).matrix);
+    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, (MV).matrix);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }
