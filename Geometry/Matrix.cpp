@@ -10,7 +10,7 @@
 Matrix4::Matrix4(float matrix[16])
 {
 	for (int i = 0; i < 16; i++)
-		this->matrix[i] = matrix[i];
+		this->elements[i] = matrix[i];
 }
 
 Matrix4::Matrix4(float a11, float a12, float a13, float a14,
@@ -18,22 +18,22 @@ Matrix4::Matrix4(float a11, float a12, float a13, float a14,
 	float a31, float a32, float a33, float a34,
 	float a41, float a42, float a43, float a44)
 {
-	this->matrix[0] = a11;
-	this->matrix[1] = a12;
-	this->matrix[2] = a13;
-	this->matrix[3] = a14;
-	this->matrix[4] = a21;
-	this->matrix[5] = a22;
-	this->matrix[6] = a23;
-	this->matrix[7] = a24;
-	this->matrix[8] = a31;
-	this->matrix[9] = a32;
-	this->matrix[10] = a33;
-	this->matrix[11] = a34;
-	this->matrix[12] = a41;
-	this->matrix[13] = a42;
-	this->matrix[14] = a43;
-	this->matrix[15] = a44;
+	this->elements[0] = a11;
+	this->elements[1] = a12;
+	this->elements[2] = a13;
+	this->elements[3] = a14;
+	this->elements[4] = a21;
+	this->elements[5] = a22;
+	this->elements[6] = a23;
+	this->elements[7] = a24;
+	this->elements[8] = a31;
+	this->elements[9] = a32;
+	this->elements[10] = a33;
+	this->elements[11] = a34;
+	this->elements[12] = a41;
+	this->elements[13] = a42;
+	this->elements[14] = a43;
+	this->elements[15] = a44;
 }
 
 void Matrix4::show()
@@ -41,10 +41,10 @@ void Matrix4::show()
 	int k = 0;
 	for (int i = 0; i < 4; i++)
 	{
-		std::cout << "(" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
+		std::cout << "(" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
 		std::cout << ")" << std::endl;
 	}
 	std::cout << std::endl;
@@ -55,7 +55,7 @@ Matrix4 Matrix4::operator +(Matrix4 other)
 	float result[16];
 
 	for (int i = 0; i < 16; i++)
-		result[i] = this->matrix[i] + other[i];
+		result[i] = this->elements[i] + other[i];
 
 	return Matrix4(result);
 }
@@ -65,7 +65,7 @@ Matrix4 Matrix4::operator -(Matrix4 other)
 	float result[16];
 
 	for (int i = 0; i < 16; i++)
-		result[i] = this->matrix[i] - other[i];
+		result[i] = this->elements[i] - other[i];
 
 	return Matrix4(result);
 }
@@ -76,10 +76,10 @@ Matrix4 Matrix4::operator *(Matrix4 other)
 
 	for (int i = 0; i < 16; i += 4)
 		for (int j = 0; j < 4; j++)
-			result[i + j] = this->matrix[i] * other[j] +
-			this->matrix[i + 1] * other[j + 4] +
-			this->matrix[i + 2] * other[j + 8] +
-			this->matrix[i + 3] * other[j + 12];
+			result[i + j] = this->elements[i] * other[j] +
+			this->elements[i + 1] * other[j + 4] +
+			this->elements[i + 2] * other[j + 8] +
+			this->elements[i + 3] * other[j + 12];
 
 	return Matrix4(result);
 }
@@ -89,23 +89,23 @@ Vector4 Matrix4::operator *(Vector4 other)
 	float vec[4];
 
 	for (int i = 0; i < 4; i++)
-		vec[i] = other[0] * this->matrix[i] +
-		other[1] * this->matrix[i + 4] +
-		other[2] * this->matrix[i + 8] +
-		other[3] * this->matrix[i + 12];
+		vec[i] = other[0] * this->elements[i] +
+		other[1] * this->elements[i + 4] +
+		other[2] * this->elements[i + 8] +
+		other[3] * this->elements[i + 12];
 
 	return Vector4(vec);
 }
 
 float& Matrix4::operator[] (const int index)
 {
-	return this->matrix[index];
+	return this->elements[index];
 }
 
 Matrix4& Matrix4::operator =(const Matrix4& other)
 {
 	for (int i = 0; i < 16; i++)
-		this->matrix[i] = other.matrix[i];
+		this->elements[i] = other.elements[i];
 	
 	return *this;
 }
@@ -149,22 +149,22 @@ Matrix4 operator /(Matrix4 mat, float right)
 Matrix3::Matrix3(float matrix[9])
 {
 	for (int i = 0; i < 9; i++)
-		this->matrix[i] = matrix[i];
+		this->elements[i] = matrix[i];
 }
 
 Matrix3::Matrix3(float a11, float a12, float a13,
 	float a21, float a22, float a23,
 	float a31, float a32, float a33)
 {
-	this->matrix[0] = a11;
-	this->matrix[1] = a12;
-	this->matrix[2] = a13;
-	this->matrix[3] = a21;
-	this->matrix[4] = a22;
-	this->matrix[5] = a23;
-	this->matrix[6] = a31;
-	this->matrix[7] = a32;
-	this->matrix[8] = a33;
+	this->elements[0] = a11;
+	this->elements[1] = a12;
+	this->elements[2] = a13;
+	this->elements[3] = a21;
+	this->elements[4] = a22;
+	this->elements[5] = a23;
+	this->elements[6] = a31;
+	this->elements[7] = a32;
+	this->elements[8] = a33;
 }
 
 void Matrix3::show()
@@ -172,9 +172,9 @@ void Matrix3::show()
 	int k = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		std::cout << "(" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
+		std::cout << "(" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
 		std::cout << ")" << std::endl;
 	}
 	std::cout << std::endl;
@@ -185,7 +185,7 @@ Matrix3 Matrix3::operator +(Matrix3 other)
 	float result[9];
 
 	for (int i = 0; i < 9; i++)
-		result[i] = this->matrix[i] + other[i];
+		result[i] = this->elements[i] + other[i];
 
 	return Matrix3(result);
 }
@@ -195,7 +195,7 @@ Matrix3 Matrix3::operator -(Matrix3 other)
 	float result[9];
 
 	for (int i = 0; i < 9; i++)
-		result[i] = this->matrix[i] - other[i];
+		result[i] = this->elements[i] - other[i];
 
 	return Matrix3(result);
 }
@@ -206,9 +206,9 @@ Matrix3 Matrix3::operator *(Matrix3 other)
 
 	for (int i = 0; i < 9; i += 3)
 		for (int j = 0; j < 3; j++)
-			result[i + j] = this->matrix[i] * other[j] +
-			this->matrix[i + 1] * other[j + 3] +
-			this->matrix[i + 2] * other[j + 6];
+			result[i + j] = this->elements[i] * other[j] +
+			this->elements[i + 1] * other[j + 3] +
+			this->elements[i + 2] * other[j + 6];
 
 	return Matrix3(result);
 }
@@ -218,22 +218,22 @@ Vector3 Matrix3::operator *(Vector3 other)
 	float vec[3];
 
 	for (int i = 0; i < 3; i++)
-		vec[i] = other[0] * this->matrix[i] +
-		other[1] * this->matrix[i + 3] +
-		other[2] * this->matrix[i + 6];
+		vec[i] = other[0] * this->elements[i] +
+		other[1] * this->elements[i + 3] +
+		other[2] * this->elements[i + 6];
 
 	return Vector3(vec);
 }
 
 float& Matrix3::operator[] (const int index)
 {
-	return this->matrix[index];
+	return this->elements[index];
 }
 
 Matrix3& Matrix3::operator =(const Matrix3& other)
 {
 	for (int i = 0; i < 9; i++)
-		this->matrix[i] = other.matrix[i];
+		this->elements[i] = other.elements[i];
 
 	return *this;
 }
@@ -277,15 +277,15 @@ Matrix3 operator /(Matrix3 mat, float right)
 Matrix2::Matrix2(float matrix[4])
 {
 	for (int i = 0; i < 4; i++)
-		this->matrix[i] = matrix[i];
+		this->elements[i] = matrix[i];
 }
 
 Matrix2::Matrix2(float a11, float a12, float a21, float a22)
 {
-	this->matrix[0] = a11;
-	this->matrix[1] = a12;
-	this->matrix[2] = a21;
-	this->matrix[3] = a22;
+	this->elements[0] = a11;
+	this->elements[1] = a12;
+	this->elements[2] = a21;
+	this->elements[3] = a22;
 }
 
 void Matrix2::show()
@@ -293,8 +293,8 @@ void Matrix2::show()
 	int k = 0;
 	for (int i = 0; i < 2; i++)
 	{
-		std::cout << "(" << this->matrix[k++];
-		std::cout << "\t" << this->matrix[k++];
+		std::cout << "(" << this->elements[k++];
+		std::cout << "\t" << this->elements[k++];
 		std::cout << ")" << std::endl;
 	}
 	std::cout << std::endl;
@@ -305,7 +305,7 @@ Matrix2 Matrix2::operator +(Matrix2 other)
 	float result[4];
 
 	for (int i = 0; i < 4; i++)
-		result[i] = this->matrix[i] + other[i];
+		result[i] = this->elements[i] + other[i];
 
 	return Matrix2(result);
 }
@@ -315,7 +315,7 @@ Matrix2 Matrix2::operator -(Matrix2 other)
 	float result[4];
 
 	for (int i = 0; i < 4; i++)
-		result[i] = this->matrix[i] - other[i];
+		result[i] = this->elements[i] - other[i];
 
 	return Matrix2(result);
 }
@@ -326,8 +326,8 @@ Matrix2 Matrix2::operator *(Matrix2 other)
 
 	for (int i = 0; i < 4; i += 2)
 		for (int j = 0; j < 2; j++)
-			result[i + j] = this->matrix[i] * other[j] +
-			this->matrix[i + 1] * other[j + 2];
+			result[i + j] = this->elements[i] * other[j] +
+			this->elements[i + 1] * other[j + 2];
 
 	return Matrix2(result);
 }
@@ -337,21 +337,21 @@ Vector2 Matrix2::operator *(Vector2 other)
 	float vec[2];
 
 	for (int i = 0; i < 2; i++)
-		vec[i] = other[0] * this->matrix[i] +
-		other[1] * this->matrix[i + 2];
+		vec[i] = other[0] * this->elements[i] +
+		other[1] * this->elements[i + 2];
 
 	return Vector2(vec);
 }
 
 float& Matrix2::operator[] (const int index)
 {
-	return this->matrix[index];
+	return this->elements[index];
 }
 
 Matrix2& Matrix2::operator =(const Matrix2& other)
 {
 	for (int i = 0; i < 4; i++)
-		this->matrix[i] = other.matrix[i];
+		this->elements[i] = other.elements[i];
 
 	return *this;
 }
@@ -441,7 +441,7 @@ Matrix4 createPerspectiveProjectionMatrix(float far, float near, float angle, in
 	left = -temp1, right = temp1;
 
 	float temp2 = near * ((float)screen_width / (float)screen_height) * tang;
-	bottom = -temp2, top = temp2;
+	bottom = -temp1, top = temp1;
 
 	float mat[16] = {
 		(2.0f * near) / (right - left), 0.0f, (right + left) / (right - left), 0.0f,

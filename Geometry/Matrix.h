@@ -4,7 +4,7 @@
 class Matrix4
 {
 public:
-	float matrix[16];
+	float elements[16];
 
 	Matrix4(float matrix[16]);
 
@@ -38,7 +38,7 @@ public:
 class Matrix3
 {
 public:
-	float matrix[9];
+	float elements[9];
 
 	Matrix3(float matrix[9]);
 
@@ -69,7 +69,7 @@ public:
 class Matrix2
 {
 public:
-	float matrix[4];
+	float elements[4];
 
 	Matrix2(float matrix[4]);
 

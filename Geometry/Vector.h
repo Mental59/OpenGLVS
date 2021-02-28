@@ -4,7 +4,7 @@ class Vector4
 {
 	
 public:
-	float vector[4];
+	float elements[4];
 
 	Vector4(float x, float y, float z, float w);
 
@@ -38,7 +38,7 @@ class Vector3
 {
 
 public:
-	float vector[3];
+	float elements[3];
 
 	Vector3(float x, float y, float z);
 
@@ -72,7 +72,7 @@ class Vector2
 {
 
 public:
-	float vector[2];
+	float elements[2];
 
 	Vector2(float x, float y);
 

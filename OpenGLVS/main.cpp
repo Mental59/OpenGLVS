@@ -85,30 +85,36 @@ bool createShaderProgram()
 {
     g_shaderProgram = 0;
 
-    const GLchar vsh[] =
+    const GLchar vsh[] = // VERTEX SHADER
     "#version 330\n"
     ""
     "layout(location = 0) in vec3 a_position;"
+    "layout(location = 1) in vec3 a_norm;"
+    ""
+    "out vec3 v_normal;"
     ""
     "uniform mat4 u_mvp;"
     ""
-    "out vec3 v_color;"
-    ""
     "void main()"
     "{"
-    "    gl_Position = u_mvp * vec4(a_position, 1.0);"
+    "   v_normal = normalize(a_norm);"
+    "   gl_Position = u_mvp * vec4(a_position, 1.0);"
     "}"
     ;
 
-    const GLchar fsh[] =
+    const GLchar fsh[] = // FRAGMENT SHADER
     "#version 330\n"
     ""
     "layout(location = 0) out vec4 o_color;"
     ""
+    "in vec3 v_normal;"
+    ""
     "void main()"
     "{"
-    "   vec3 v_color = vec3(1.0, 0.0, 0.0);"
-    "   o_color = vec4(v_color, 1.0);"
+    "   vec3 a_color = vec3(1.0, 0.0, 0.0);"
+    ""
+    "   vec3 n = normalize(v_normal);"
+    "   o_color = vec4(abs(n), 1.0);" 
     "}"
     ;
 
@@ -131,35 +137,35 @@ bool createModel()
 {
     const GLfloat vertices[] =
     {
-        -1.0, -1.0, 1.0,
-        1.0, -1.0, 1.0,
-        1.0, 1.0, 1.0,
-        -1.0, 1.0, 1.0,
+        -1.0, -1.0, 1.0, 0.0, 0.0, 1.0, // 0
+        1.0, -1.0, 1.0, 0.0, 0.0, 1.0, // 1
+        1.0, 1.0, 1.0, 0.0, 0.0, 1.0, // 2
+        -1.0, 1.0, 1.0, 0.0, 0.0, 1.0, // 3
 
-        1.0, -1.0, 1.0,
-        1.0, -1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, 1.0, 1.0,
+        1.0, -1.0, 1.0, 1.0, 0.0, 0.0, // 4
+        1.0, -1.0, -1.0, 1.0, 0.0, 0.0, // 5
+        1.0, 1.0, -1.0, 1.0, 0.0, 0.0, // 6
+        1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // 7
 
-        1.0, 1.0, 1.0,
-        1.0, 1.0, -1.0,
-        -1.0, 1.0, -1.0,
-        -1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 0.0, 1.0, 0.0, // 8
+        1.0, 1.0, -1.0, 0.0, 1.0, 0.0, // 9
+        -1.0, 1.0, -1.0, 0.0, 1.0, 0.0, // 10
+        -1.0, 1.0, 1.0, 0.0, 1.0, 0.0, // 11
 
-        -1.0, 1.0, 1.0,
-        -1.0, 1.0, -1.0,
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0, 1.0,
+        -1.0, 1.0, 1.0, -1.0, 0.0, 0.0, // 12
+        -1.0, 1.0, -1.0, -1.0, 0.0, 0.0, // 13
+        -1.0, -1.0, -1.0, -1.0, 0.0, 0.0, // 14
+        -1.0, -1.0, 1.0, -1.0, 0.0, 0.0, // 15
 
-        -1.0, -1.0, 1.0,
-        -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0,
-        1.0, -1.0, 1.0,
+        -1.0, -1.0, 1.0, 0.0, -1.0, 0.0, // 16
+        -1.0, -1.0, -1.0, 0.0, -1.0, 0.0, // 17
+        1.0, -1.0, -1.0, 0.0, -1.0, 0.0, // 18
+        1.0, -1.0, 1.0, 0.0, -1.0, 0.0, // 19
 
-        -1.0, -1.0, -1.0,
-        -1.0, 1.0, -1.0,
-        1.0, 1.0, -1.0,
-        1.0, -1.0, -1.0,
+        -1.0, -1.0, -1.0, 0.0, 0.0, -1.0, // 20
+        -1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 21
+        1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 22
+        1.0, -1.0, -1.0, 0.0, 0.0, -1.0, // 23
     };
 
     const GLuint indices[] =
@@ -186,7 +192,9 @@ bool createModel()
     g_model.indexCount = 6 * 6;
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const GLvoid *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)(3 * sizeof(GLfloat)));
 
     return g_model.vbo != 0 && g_model.ibo != 0 && g_model.vao != 0;
 }
@@ -216,20 +224,20 @@ void draw(double delta)
 
     Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
     Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
-    Matrix4 R1 = createRotateMatrix(0.0f, 1.0f, 0.0f, 60.0f);
+    Matrix4 R1 = createRotateMatrix(0.0f, 1.0f, 0.0f, 30.0f);
     Matrix4 R2 = createRotateMatrix(1.0f, 0.0f, 0.0f, 30.0f);
-    Matrix4 MV =  S * T * R1 * R2;
+    Matrix4 MV =  S * R1 * R2;
     Matrix4 P = createPerspectiveProjectionMatrix(1000.0f, 0.01f, 40.0f, 800, 600);
 
-    /*const GLfloat mvp[] =
+    const GLfloat mvp[] =
     {
         1.708748f, -1.478188f, -0.360884f, -0.353738f,
         0.000000f, 1.208897f, -0.883250f, -0.865760f,
         -1.707388f, -1.479366f, -0.361171f, -0.354019f,
         0.000000f, 0.000000f, 4.898990f, 5.000000f
-    };*/
+    };
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, (MV).matrix);
+    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, MV.elements);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }
