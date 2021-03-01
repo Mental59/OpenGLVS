@@ -11,6 +11,7 @@ GLFWwindow *g_window;
 
 GLuint g_shaderProgram;
 GLint g_uMVP;
+GLint g_uN;
 
 chrono::time_point<chrono::system_clock> g_callTime;
 
@@ -91,13 +92,14 @@ bool createShaderProgram()
     "layout(location = 0) in vec3 a_position;"
     "layout(location = 1) in vec3 a_norm;"
     ""
-    "out vec3 v_normal;"
-    ""
     "uniform mat4 u_mvp;"
+    "uniform mat3 u_n;"
+    ""
+    "out vec3 v_normal;"
     ""
     "void main()"
     "{"
-    "   v_normal = normalize(a_norm);"
+    "   v_normal = transpose(inverse(u_n)) * normalize(a_norm);"
     "   gl_Position = u_mvp * vec4(a_position, 1.0);"
     "}"
     ;
@@ -105,16 +107,16 @@ bool createShaderProgram()
     const GLchar fsh[] = // FRAGMENT SHADER
     "#version 330\n"
     ""
-    "layout(location = 0) out vec4 o_color;"
-    ""
     "in vec3 v_normal;"
+    ""
+    "layout(location = 0) out vec4 o_color;"  
     ""
     "void main()"
     "{"
     "   vec3 a_color = vec3(1.0, 0.0, 0.0);"
     ""
     "   vec3 n = normalize(v_normal);"
-    "   o_color = vec4(abs(n), 1.0);" 
+    "   o_color = vec4(abs(n), 1.0);"
     "}"
     ;
 
@@ -126,6 +128,7 @@ bool createShaderProgram()
     g_shaderProgram = createProgram(vertexShader, fragmentShader);
 
     g_uMVP = glGetUniformLocation(g_shaderProgram, "u_mvp");
+    g_uN = glGetUniformLocation(g_shaderProgram, "u_n");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -165,7 +168,7 @@ bool createModel()
         -1.0, -1.0, -1.0, 0.0, 0.0, -1.0, // 20
         -1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 21
         1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 22
-        1.0, -1.0, -1.0, 0.0, 0.0, -1.0, // 23
+        1.0, -1.0, -1.0, 0.0, 0.0, -1.0 // 23
     };
 
     const GLuint indices[] =
@@ -222,22 +225,22 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
-    Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
-    Matrix4 R1 = createRotateMatrix(0.0f, 1.0f, 0.0f, 30.0f);
-    Matrix4 R2 = createRotateMatrix(1.0f, 0.0f, 0.0f, 30.0f);
-    Matrix4 MV =  S * R1 * R2;
-    Matrix4 P = createPerspectiveProjectionMatrix(1000.0f, 0.01f, 40.0f, 800, 600);
+    static Matrix4 S = createScaleMatrix(0.25f, 0.25f, 0.25f);
 
-    const GLfloat mvp[] =
-    {
-        1.708748f, -1.478188f, -0.360884f, -0.353738f,
-        0.000000f, 1.208897f, -0.883250f, -0.865760f,
-        -1.707388f, -1.479366f, -0.361171f, -0.354019f,
-        0.000000f, 0.000000f, 4.898990f, 5.000000f
-    };
+    static Matrix4 Ry = createRotateYMatrix(30.0f);
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, MV.elements);
+    static Matrix4 Rx = createRotateXMatrix(60.0f);
+
+    static Matrix4 MV = S * Ry * Rx;
+
+    static Matrix3 UN = getMainMinor(MV);
+
+    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.1f, 45.0f, 4, 3);
+
+    static Matrix4 MVP = P * MV;
+
+    glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MV.elements);
+    glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }

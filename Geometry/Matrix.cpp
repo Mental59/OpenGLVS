@@ -102,14 +102,6 @@ float& Matrix4::operator[] (const int index)
 	return this->elements[index];
 }
 
-Matrix4& Matrix4::operator =(const Matrix4& other)
-{
-	for (int i = 0; i < 16; i++)
-		this->elements[i] = other.elements[i];
-	
-	return *this;
-}
-
 Matrix4 operator *(Matrix4 mat, float right)
 {
 	float result[16];
@@ -230,14 +222,6 @@ float& Matrix3::operator[] (const int index)
 	return this->elements[index];
 }
 
-Matrix3& Matrix3::operator =(const Matrix3& other)
-{
-	for (int i = 0; i < 9; i++)
-		this->elements[i] = other.elements[i];
-
-	return *this;
-}
-
 Matrix3 operator *(Matrix3 mat, float right)
 {
 	float result[9];
@@ -348,14 +332,6 @@ float& Matrix2::operator[] (const int index)
 	return this->elements[index];
 }
 
-Matrix2& Matrix2::operator =(const Matrix2& other)
-{
-	for (int i = 0; i < 4; i++)
-		this->elements[i] = other.elements[i];
-
-	return *this;
-}
-
 Matrix2 operator *(Matrix2 mat, float right)
 {
 	float result[4];
@@ -416,36 +392,65 @@ Matrix4 createScaleMatrix(float sx, float sy, float sz)
 	return Matrix4(mat);
 }
 
-Matrix4 createRotateMatrix(float x, float y, float z, float angle)
+Matrix4 createRotateXMatrix(float angle)
 {
 	float c = cos(angle * PI / 180.0f);
 	float s = sin(angle * PI / 180.0f);
 
 	float mat[16] = {
-		x * x * (1.0f - c) + c, x * y * (1.0f - c) - z * s, x * z * (1.0f - c) + y * s, 0.0f,
-		y * x * (1.0f - c) + z * s, y * y * (1.0f - c) + c, y * z * (1 - c) - x * s, 0.0f,
-		x * z * (1.0f - c) - y * s, y * z * (1.0f - c) + x * s, z * z * (1 - c) + c, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, c, -s, 0.0f,
+		0.0f, s, c, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
 
 	return Matrix4(mat);
 }
 
-Matrix4 createPerspectiveProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height)
+Matrix4 createRotateYMatrix(float angle)
+{
+	float c = cos(angle * PI / 180.0f);
+	float s = sin(angle * PI / 180.0f);
+
+	float mat[16] = {
+		c, 0.0f, s, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		-s, 0.0f, c, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	return Matrix4(mat);
+}
+
+Matrix4 createRotateZMatrix(float angle)
+{
+	float c = cos(angle * PI / 180.0f);
+	float s = sin(angle * PI / 180.0f);
+
+	float mat[16] = {
+		c, -s, 0.0f, 0.0f,
+		s, c, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	return Matrix4(mat);
+}
+
+Matrix4 createPerspectiveProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height)
 {
 	float right, left, bottom, top;
 
-	float tang = tan((angle * PI / 180.0f) / 2.0f);
+	float scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
 
-	float temp1 = near * tang;
-	left = -temp1, right = temp1;
-
-	float temp2 = near * ((float)screen_width / (float)screen_height) * tang;
-	bottom = -temp1, top = temp1;
+	right = scale;
+	left = -right;
+	top = ((float)screen_width / (float)screen_height) * scale;
+	bottom = -top;
 
 	float mat[16] = {
-		(2.0f * near) / (right - left), 0.0f, (right + left) / (right - left), 0.0f,
-		0.0f, (2.0f * near) / (top - bottom), (top + bottom) / (top - bottom), 0.0f,
+		(2.0f * near) / (right - left), 0.0f, 0.0f, 0.0f,
+		0.0f, (2.0f * near) / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -(far + near) / (far - near), -(2.0f * far * near) / (far - near),
 		0.0f, 0.0f, -1.0f, 0.0f
 	};
@@ -453,21 +458,20 @@ Matrix4 createPerspectiveProjectionMatrix(float far, float near, float angle, in
 	return Matrix4(mat);
 }
 
-Matrix4 createParallelProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height)
+Matrix4 createParallelProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height)
 {
 	float right, left, bottom, top;
 
-	float tang = tan((angle * PI / 180.0f) / 2.0f);
+	float scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
 
-	float temp1 = near * tang;
-	left = -temp1, right = temp1;
-
-	float temp2 = near * ((float)screen_width / (float)screen_height) * tang;
-	bottom = -temp2, top = temp2;
+	right = scale;
+	left = -right;
+	top = ((float)screen_width / (float)screen_height) * scale;
+	bottom = -top;
 
 	float mat[16] = {
-		2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
-		0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),
+		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
+		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
@@ -476,3 +480,22 @@ Matrix4 createParallelProjectionMatrix(float far, float near, float angle, int s
 }
 
 #pragma endregion
+
+Matrix3 getMainMinor(Matrix4 mat4)
+{
+	float mat[9] = {
+		mat4.elements[0], mat4.elements[1], mat4.elements[2],
+		mat4.elements[4], mat4.elements[5], mat4.elements[6],
+		mat4.elements[8], mat4.elements[9], mat4.elements[10]
+	};
+	return Matrix3(mat);
+}
+
+Matrix2 getMainMinor(Matrix3 mat3)
+{
+	float mat[4] = {
+		mat3.elements[0], mat3.elements[1],
+		mat3.elements[3], mat3.elements[4]
+	};
+	return Matrix2(mat);
+}

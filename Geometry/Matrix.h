@@ -22,8 +22,6 @@ public:
 	Vector4 operator *(Vector4 other);
 
 	float& operator[] (const int index);
-	
-	Matrix4& operator =(const Matrix4& other);
 
 	void show();
 
@@ -54,8 +52,6 @@ public:
 
 	float& operator[] (const int index);
 
-	Matrix3& operator =(const Matrix3& other);
-
 	void show();
 
 	friend Matrix3 operator *(Matrix3 mat, float right);
@@ -85,8 +81,6 @@ public:
 
 	float& operator[] (const int index);
 
-	Matrix2& operator =(const Matrix2& other);
-
 	void show();
 
 	friend Matrix2 operator *(Matrix2 mat, float right);
@@ -101,8 +95,13 @@ Matrix4 createTranslateMatrix(float x, float y, float z);
 
 Matrix4 createScaleMatrix(float sx, float sy, float sz);
 
-Matrix4 createRotateMatrix(float x, float y, float z, float angle);
+Matrix4 createRotateXMatrix(float angle);
+Matrix4 createRotateYMatrix(float angle);
+Matrix4 createRotateZMatrix(float angle);
 
-Matrix4 createPerspectiveProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height);
+Matrix4 createPerspectiveProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height);
 
-Matrix4 createParallelProjectionMatrix(float far, float near, float angle, int screen_width, int screen_height);
+Matrix4 createParallelProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height);
+
+Matrix3 getMainMinor(Matrix4 mat4);
+Matrix2 getMainMinor(Matrix3 mat3);
