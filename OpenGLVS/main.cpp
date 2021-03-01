@@ -11,6 +11,7 @@ GLFWwindow *g_window;
 
 GLuint g_shaderProgram;
 GLint g_uMVP;
+GLint g_uMV;
 GLint g_uN;
 
 chrono::time_point<chrono::system_clock> g_callTime;
@@ -93,14 +94,21 @@ bool createShaderProgram()
     "layout(location = 1) in vec3 a_norm;"
     ""
     "uniform mat4 u_mvp;"
+    "uniform mat4 u_mv;"
     "uniform mat3 u_n;"
     ""
     "out vec3 v_normal;"
+    "out vec3 v_pos;"
+    ""
+    "float f(vec2 p) { return p.x * p.y; }"
+    "vec3 gradient(vec2 p) { return vec3(-p[0], 1.0, -p[1]); }"
     ""
     "void main()"
     "{"
+    "   vec4 p0 = vec4(a_position, 1.0);"
     "   v_normal = transpose(inverse(u_n)) * normalize(a_norm);"
-    "   gl_Position = u_mvp * vec4(a_position, 1.0);"
+    "   v_pos = vec3(u_mv * p0);"
+    "   gl_Position = u_mvp * p0;"
     "}"
     ;
 
@@ -108,15 +116,23 @@ bool createShaderProgram()
     "#version 330\n"
     ""
     "in vec3 v_normal;"
+    "in vec3 v_pos;"
     ""
     "layout(location = 0) out vec4 o_color;"  
     ""
     "void main()"
     "{"
-    "   vec3 a_color = vec3(1.0, 0.0, 0.0);"
+    "   vec3 color = vec3(1.0, 0.0, 0.0);"
+    ""
+    "   vec3 E = vec3(0.0, 0.0, 0.0);"
+    "   vec3 L = vec3(5.0, 5.0, 0.0);"
     ""
     "   vec3 n = normalize(v_normal);"
-    "   o_color = vec4(abs(n), 1.0);"
+    "   vec3 l = normalize(v_pos - L);"
+    ""
+    "   float d = max(dot(n, -l), 0.15);"
+    ""
+    "   o_color = vec4(color * d, 1.0);"
     "}"
     ;
 
@@ -129,6 +145,7 @@ bool createShaderProgram()
 
     g_uMVP = glGetUniformLocation(g_shaderProgram, "u_mvp");
     g_uN = glGetUniformLocation(g_shaderProgram, "u_n");
+    g_uMV = glGetUniformLocation(g_shaderProgram, "u_mv");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -241,6 +258,7 @@ void draw(double delta)
 
     glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MV.elements);
     glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);
+    glUniformMatrix3fv(g_uMV, 1, GL_TRUE, MV.elements);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }
