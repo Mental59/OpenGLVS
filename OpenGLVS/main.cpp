@@ -27,6 +27,26 @@ public:
 
 Model g_model;
 
+GLfloat* createMesh(const int n)
+{
+    GLfloat* mesh = new GLfloat[2 * n * n];
+    GLfloat k2 = 0;
+
+    for (int i = 0; i < 2 * n * n; i += 2 * n)
+    {
+        GLfloat k1 = 0;
+        for (int j = 0; j < 2 * n; j+=2)
+        {
+            mesh[i + j] = k1;
+            mesh[i + j + 1] = k2;
+            k1 += 1.0f / (GLfloat)(n - 1);
+        }
+        k2 += 1.0f / (GLfloat)(n - 1);
+    }
+
+    return mesh;
+}
+
 GLuint createShader(const GLchar *code, GLenum type)
 {
     GLuint result = glCreateShader(type);
@@ -90,8 +110,7 @@ bool createShaderProgram()
     const GLchar vsh[] = // VERTEX SHADER
     "#version 330\n"
     ""
-    "layout(location = 0) in vec3 a_position;"
-    "layout(location = 1) in vec3 a_norm;"
+    "layout(location = 0) in vec2 a_position;"
     ""
     "uniform mat4 u_mvp;"
     "uniform mat4 u_mv;"
@@ -100,13 +119,30 @@ bool createShaderProgram()
     "out vec3 v_normal;"
     "out vec3 v_pos;"
     ""
-    "float f(vec2 p) { return p.x * p.y; }"
-    "vec3 gradient(vec2 p) { return vec3(-p[0], 1.0, -p[1]); }"
+    "float f(vec2 p)"
+    "{"
+    "   float a = 2.0;"
+    "   float b = 1.0;"
+    "   float c = 1.0;"
+    "   float squaresum = p[0] * p[0] + p[1] * p[1];"
+    "   return a * cos(b * squaresum) * exp(c * squaresum);"
+    "}"
+    ""
+    "vec3 gradient(vec2 p)"
+    "{"
+    "   float a = 2.0;"
+    "   float b = 1.0;"
+    "   float c = 1.0;"
+    "   float squaresum = p[0] * p[0] + p[1] * p[1];"
+    "   float temp = 2.0 * a * exp(c * squaresum) * (c * cos(b * squaresum) - b * sin(b * squaresum));"
+    "   return vec3(-p[0] * temp, 1.0, -p[1] * temp);"
+    "}"
     ""
     "void main()"
     "{"
-    "   vec4 p0 = vec4(a_position, 1.0);"
-    "   v_normal = transpose(inverse(u_n)) * normalize(a_norm);"
+    "   float y = f(a_position);"
+    "   vec4 p0 = vec4(a_position[0], y, a_position[1], 1.0);"
+    "   v_normal = transpose(inverse(u_n)) * normalize(gradient(a_position));"
     "   v_pos = vec3(u_mv * p0);"
     "   gl_Position = u_mvp * p0;"
     "}"
@@ -126,13 +162,19 @@ bool createShaderProgram()
     ""
     "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
+    "   float S = 80.0;"
     ""
     "   vec3 n = normalize(v_normal);"
     "   vec3 l = normalize(v_pos - L);"
     ""
-    "   float d = max(dot(n, -l), 0.15);"
+    "   float d = max(dot(n, -l), 0.1);"
     ""
-    "   o_color = vec4(color * d, 1.0);"
+    "   vec3 e = normalize(E - v_pos);"
+    "   vec3 h = normalize(-l + e);"
+    ""
+    "   float s = pow(max(dot(n, h), 0.0), S);"
+    ""
+    "   o_color = vec4(color * d + s * vec3(1.0, 1.0, 1.0), 1.0);"
     "}"
     ;
 
@@ -155,66 +197,54 @@ bool createShaderProgram()
 
 bool createModel()
 {
-    const GLfloat vertices[] =
+    const int n = 100;
+
+    GLfloat* vertices = createMesh(n);
+
+    const int indices_size = (n - 1) * (n - 1) * 6;
+
+    GLuint* indices = new GLuint[indices_size];
+
+    int k = 0;
+    for (int i = 0; i < indices_size; )
     {
-        -1.0, -1.0, 1.0, 0.0, 0.0, 1.0, // 0
-        1.0, -1.0, 1.0, 0.0, 0.0, 1.0, // 1
-        1.0, 1.0, 1.0, 0.0, 0.0, 1.0, // 2
-        -1.0, 1.0, 1.0, 0.0, 0.0, 1.0, // 3
+        for (int count = 0; count < n - 1; count++, i += 6)
+        {
+            indices[i] = k;
+            indices[i + 1] = k + n;
+            indices[i + 2] = k + 1;
+            indices[i + 3] = k + n;
+            indices[i + 4] = k + n + 1;
+            indices[i + 5] = k + 1;
+            k++;
+        }
+        k++;
+    }
 
-        1.0, -1.0, 1.0, 1.0, 0.0, 0.0, // 4
-        1.0, -1.0, -1.0, 1.0, 0.0, 0.0, // 5
-        1.0, 1.0, -1.0, 1.0, 0.0, 0.0, // 6
-        1.0, 1.0, 1.0, 1.0, 0.0, 0.0, // 7
-
-        1.0, 1.0, 1.0, 0.0, 1.0, 0.0, // 8
-        1.0, 1.0, -1.0, 0.0, 1.0, 0.0, // 9
-        -1.0, 1.0, -1.0, 0.0, 1.0, 0.0, // 10
-        -1.0, 1.0, 1.0, 0.0, 1.0, 0.0, // 11
-
-        -1.0, 1.0, 1.0, -1.0, 0.0, 0.0, // 12
-        -1.0, 1.0, -1.0, -1.0, 0.0, 0.0, // 13
-        -1.0, -1.0, -1.0, -1.0, 0.0, 0.0, // 14
-        -1.0, -1.0, 1.0, -1.0, 0.0, 0.0, // 15
-
-        -1.0, -1.0, 1.0, 0.0, -1.0, 0.0, // 16
-        -1.0, -1.0, -1.0, 0.0, -1.0, 0.0, // 17
-        1.0, -1.0, -1.0, 0.0, -1.0, 0.0, // 18
-        1.0, -1.0, 1.0, 0.0, -1.0, 0.0, // 19
-
-        -1.0, -1.0, -1.0, 0.0, 0.0, -1.0, // 20
-        -1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 21
-        1.0, 1.0, -1.0, 0.0, 0.0, -1.0, // 22
-        1.0, -1.0, -1.0, 0.0, 0.0, -1.0 // 23
-    };
-
-    const GLuint indices[] =
+    for (int i = 0; i < 2 * n * n; i += 2)
     {
-        0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4,
-        8, 9, 10, 10, 11, 8,
-        12, 13, 14, 14, 15, 12,
-        16, 17, 18, 18, 19, 16,
-        20, 21, 22, 22, 23, 20
-    };
+        vertices[i] -= 0.5;
+        vertices[i + 1] -= 0.5;
+    }
 
     glGenVertexArrays(1, &g_model.vao);
     glBindVertexArray(g_model.vao);
 
     glGenBuffers(1, &g_model.vbo);
     glBindBuffer(GL_ARRAY_BUFFER, g_model.vbo);
-    glBufferData(GL_ARRAY_BUFFER, 24 * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 2 * n * n * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
     
     glGenBuffers(1, &g_model.ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_model.ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(GLuint), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
-    g_model.indexCount = 6 * 6;
+    delete[] vertices;
+    delete[] indices;
+
+    g_model.indexCount = indices_size;
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (const GLvoid *)0);
 
     return g_model.vbo != 0 && g_model.ibo != 0 && g_model.vao != 0;
 }
@@ -242,23 +272,27 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    static Matrix4 S = createScaleMatrix(0.25f, 0.25f, 0.25f);
+    static Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
 
-    static Matrix4 Ry = createRotateYMatrix(30.0f);
+    static Matrix4 T = createTranslateMatrix(0.0f, -1.5f, -1.5f);
 
-    static Matrix4 Rx = createRotateXMatrix(60.0f);
+    static Matrix4 Ry = createRotateYMatrix(60.0f);
 
-    static Matrix4 MV = S * Ry * Rx;
+    static Matrix4 Rx = createRotateXMatrix(15.0f);
+
+    static Matrix4 Rz = createRotateZMatrix(30.0f);
+
+    static Matrix4 MV = T * S * Ry;
 
     static Matrix3 UN = getMainMinor(MV);
 
-    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.1f, 45.0f, 4, 3);
+    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3);
 
     static Matrix4 MVP = P * MV;
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MV.elements);
+    glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MVP.elements);
     glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);
-    glUniformMatrix3fv(g_uMV, 1, GL_TRUE, MV.elements);
+    glUniformMatrix4fv(g_uMV, 1, GL_TRUE, MV.elements);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }
@@ -328,7 +362,7 @@ void tearDownOpenGL()
 }
 
 int main()
-{
+{   
     // Initialize OpenGL
     if (!initOpenGL())
         return -1;
