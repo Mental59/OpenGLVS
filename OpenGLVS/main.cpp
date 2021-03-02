@@ -13,6 +13,9 @@ GLuint g_shaderProgram;
 GLint g_uMVP;
 GLint g_uMV;
 GLint g_uN;
+GLint g_uParams;
+
+GLfloat params[] = { -0.1f, 90.0f, -5.0f };
 
 chrono::time_point<chrono::system_clock> g_callTime;
 
@@ -115,24 +118,25 @@ bool createShaderProgram()
     "uniform mat4 u_mvp;"
     "uniform mat4 u_mv;"
     "uniform mat3 u_n;"
+    "uniform vec3 u_params;"
     ""
     "out vec3 v_normal;"
     "out vec3 v_pos;"
     ""
     "float f(vec2 p)"
     "{"
-    "   float a = 2.0;"
-    "   float b = 1.0;"
-    "   float c = 1.0;"
+    "   float a = u_params[0];"
+    "   float b = u_params[1];"
+    "   float c = u_params[2];"
     "   float squaresum = p[0] * p[0] + p[1] * p[1];"
     "   return a * cos(b * squaresum) * exp(c * squaresum);"
     "}"
     ""
     "vec3 gradient(vec2 p)"
     "{"
-    "   float a = 2.0;"
-    "   float b = 1.0;"
-    "   float c = 1.0;"
+    "   float a = u_params[0];"
+    "   float b = u_params[1];"
+    "   float c = u_params[2];"
     "   float squaresum = p[0] * p[0] + p[1] * p[1];"
     "   float temp = 2.0 * a * exp(c * squaresum) * (c * cos(b * squaresum) - b * sin(b * squaresum));"
     "   return vec3(-p[0] * temp, 1.0, -p[1] * temp);"
@@ -162,7 +166,7 @@ bool createShaderProgram()
     ""
     "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
-    "   float S = 80.0;"
+    "   float S = 90.0;"
     ""
     "   vec3 n = normalize(v_normal);"
     "   vec3 l = normalize(v_pos - L);"
@@ -188,6 +192,7 @@ bool createShaderProgram()
     g_uMVP = glGetUniformLocation(g_shaderProgram, "u_mvp");
     g_uN = glGetUniformLocation(g_shaderProgram, "u_n");
     g_uMV = glGetUniformLocation(g_shaderProgram, "u_mv");
+    g_uParams = glGetUniformLocation(g_shaderProgram, "u_params");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -197,7 +202,7 @@ bool createShaderProgram()
 
 bool createModel()
 {
-    const int n = 100;
+    const int n = 2000;
 
     GLfloat* vertices = createMesh(n);
 
@@ -252,7 +257,7 @@ bool createModel()
 bool init()
 {
     // Set initial color of color buffer to white.
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -274,15 +279,15 @@ void draw(double delta)
 
     static Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
 
-    static Matrix4 T = createTranslateMatrix(0.0f, -1.5f, -1.5f);
+    static Matrix4 T = createTranslateMatrix(0.0f, -0.1f, -1.0f);
 
-    static Matrix4 Ry = createRotateYMatrix(60.0f);
+    static Matrix4 Ry = createRotateYMatrix(20.0f);
 
-    static Matrix4 Rx = createRotateXMatrix(15.0f);
+    static Matrix4 Rx = createRotateXMatrix(40.0f);
 
     static Matrix4 Rz = createRotateZMatrix(30.0f);
 
-    static Matrix4 MV = T * S * Ry;
+    static Matrix4 MV = T * S * Rx * Ry;
 
     static Matrix3 UN = getMainMinor(MV);
 
@@ -293,6 +298,7 @@ void draw(double delta)
     glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MVP.elements);
     glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);
     glUniformMatrix4fv(g_uMV, 1, GL_TRUE, MV.elements);
+    glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 }
