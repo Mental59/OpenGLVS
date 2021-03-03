@@ -173,12 +173,12 @@ bool createShaderProgram()
     "   float S = 90.0;"
     ""
     "   vec3 n = normalize(v_normal);"
-    "   vec3 l = normalize(v_pos - L);"
+    "   vec3 l = normalize(L - v_pos);"
     ""
-    "   float d = max(dot(n, -l), 0.1);"
+    "   float d = max(dot(n, l), 0.1);"
     ""
-    "   vec3 e = normalize(E - v_pos);"
-    "   vec3 h = normalize(-l + e);"
+    "   vec3 e = normalize(-v_pos);"
+    "   vec3 h = normalize(l + e);"
     ""
     "   float s = pow(max(dot(n, h), 0.0), S);"
     ""
@@ -288,19 +288,19 @@ void draw(double delta)
 
     static Matrix4 T = createTranslateMatrix(0.0f, -0.1f, -1.25f);
 
-    cout << "Current time: " << glfwGetTime() << endl;
-
-    Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
-
-    Matrix4 Rx = createRotateXMatrix(xAngle);
+    static Matrix4 Rx = createRotateXMatrix(xAngle);
 
     static Matrix4 Rz = createRotateZMatrix(zAngle);
 
-    Matrix4 MV = T * S * Rx * Ry;
-
-    Matrix3 UN = getMainMinor(MV);
+    static Matrix4 s_MV = T * S * Rx;
 
     static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3);
+
+    Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
+
+    Matrix4 MV = s_MV * Ry;
+
+    Matrix3 UN = getMainMinor(MV);
 
     Matrix4 MVP = P * MV;
 
