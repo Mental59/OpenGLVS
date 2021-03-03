@@ -15,7 +15,8 @@ GLint g_uMV;
 GLint g_uN;
 GLint g_uParams;
 
-GLfloat params[] = { -0.1f, 90.0f, -5.0f };
+GLfloat params[] = { -0.05f, -90.0f, -5.0f };
+int sign = 1;
 
 chrono::time_point<chrono::system_clock> g_callTime;
 
@@ -162,7 +163,7 @@ bool createShaderProgram()
     ""
     "void main()"
     "{"
-    "   vec3 color = vec3(1.0, 0.0, 0.0);"
+    "   vec3 color = vec3(0.0, 1.0, 1.0);"
     ""
     "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
@@ -271,6 +272,10 @@ void reshape(GLFWwindow *window, int width, int height)
 
 void draw(double delta)
 {
+    cout << "params[1] = " << params[1] << endl;
+   
+    params[1] += delta * 12.0 * sign;
+
     // Clear color buffer.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -279,7 +284,7 @@ void draw(double delta)
 
     static Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
 
-    static Matrix4 T = createTranslateMatrix(0.0f, -0.1f, -1.0f);
+    static Matrix4 T = createTranslateMatrix(-0.03f, -0.1f, -1.0f);
 
     static Matrix4 Ry = createRotateYMatrix(20.0f);
 
@@ -301,6 +306,9 @@ void draw(double delta)
     glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
+
+    if (abs(params[1]) > 90.0)
+        sign *= -1;
 }
 
 void cleanup()
