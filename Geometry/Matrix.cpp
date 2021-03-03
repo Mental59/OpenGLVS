@@ -7,16 +7,16 @@
 
 #pragma region Class Matrix4
 
-Matrix4::Matrix4(float matrix[16])
+Matrix4::Matrix4(GEOMfloat matrix[16])
 {
 	for (int i = 0; i < 16; i++)
 		this->elements[i] = matrix[i];
 }
 
-Matrix4::Matrix4(float a11, float a12, float a13, float a14,
-	float a21, float a22, float a23, float a24,
-	float a31, float a32, float a33, float a34,
-	float a41, float a42, float a43, float a44)
+Matrix4::Matrix4(GEOMfloat a11, GEOMfloat a12, GEOMfloat a13, GEOMfloat a14,
+	GEOMfloat a21, GEOMfloat a22, GEOMfloat a23, GEOMfloat a24,
+	GEOMfloat a31, GEOMfloat a32, GEOMfloat a33, GEOMfloat a34,
+	GEOMfloat a41, GEOMfloat a42, GEOMfloat a43, GEOMfloat a44)
 {
 	this->elements[0] = a11;
 	this->elements[1] = a12;
@@ -52,7 +52,7 @@ void Matrix4::show()
 
 Matrix4 Matrix4::operator +(Matrix4 other)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i++)
 		result[i] = this->elements[i] + other[i];
@@ -62,7 +62,7 @@ Matrix4 Matrix4::operator +(Matrix4 other)
 
 Matrix4 Matrix4::operator -(Matrix4 other)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i++)
 		result[i] = this->elements[i] - other[i];
@@ -72,7 +72,7 @@ Matrix4 Matrix4::operator -(Matrix4 other)
 
 Matrix4 Matrix4::operator *(Matrix4 other)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i += 4)
 		for (int j = 0; j < 4; j++)
@@ -86,7 +86,7 @@ Matrix4 Matrix4::operator *(Matrix4 other)
 
 Vector4 Matrix4::operator *(Vector4 other)
 {
-	float vec[4];
+	GEOMfloat vec[4];
 
 	for (int i = 0; i < 4; i++)
 		vec[i] = other[0] * this->elements[i] +
@@ -97,14 +97,14 @@ Vector4 Matrix4::operator *(Vector4 other)
 	return Vector4(vec);
 }
 
-float& Matrix4::operator[] (const int index)
+GEOMfloat& Matrix4::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-Matrix4 operator *(Matrix4 mat, float right)
+Matrix4 operator *(Matrix4 mat, GEOMfloat right)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i++)
 		result[i] = mat[i] * right;
@@ -112,9 +112,9 @@ Matrix4 operator *(Matrix4 mat, float right)
 	return Matrix4(result);
 }
 
-Matrix4 operator *(float left, Matrix4 mat)
+Matrix4 operator *(GEOMfloat left, Matrix4 mat)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i++)
 		result[i] = mat[i] * left;
@@ -122,9 +122,9 @@ Matrix4 operator *(float left, Matrix4 mat)
 	return Matrix4(result);
 }
 
-Matrix4 operator /(Matrix4 mat, float right)
+Matrix4 operator /(Matrix4 mat, GEOMfloat right)
 {
-	float result[16];
+	GEOMfloat result[16];
 
 	for (int i = 0; i < 16; i++)
 		result[i] = mat[i] / right;
@@ -138,15 +138,15 @@ Matrix4 operator /(Matrix4 mat, float right)
 
 #pragma region Class Matrix3
 
-Matrix3::Matrix3(float matrix[9])
+Matrix3::Matrix3(GEOMfloat matrix[9])
 {
 	for (int i = 0; i < 9; i++)
 		this->elements[i] = matrix[i];
 }
 
-Matrix3::Matrix3(float a11, float a12, float a13,
-	float a21, float a22, float a23,
-	float a31, float a32, float a33)
+Matrix3::Matrix3(GEOMfloat a11, GEOMfloat a12, GEOMfloat a13,
+	GEOMfloat a21, GEOMfloat a22, GEOMfloat a23,
+	GEOMfloat a31, GEOMfloat a32, GEOMfloat a33)
 {
 	this->elements[0] = a11;
 	this->elements[1] = a12;
@@ -174,7 +174,7 @@ void Matrix3::show()
 
 Matrix3 Matrix3::operator +(Matrix3 other)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i++)
 		result[i] = this->elements[i] + other[i];
@@ -184,7 +184,7 @@ Matrix3 Matrix3::operator +(Matrix3 other)
 
 Matrix3 Matrix3::operator -(Matrix3 other)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i++)
 		result[i] = this->elements[i] - other[i];
@@ -194,7 +194,7 @@ Matrix3 Matrix3::operator -(Matrix3 other)
 
 Matrix3 Matrix3::operator *(Matrix3 other)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i += 3)
 		for (int j = 0; j < 3; j++)
@@ -207,7 +207,7 @@ Matrix3 Matrix3::operator *(Matrix3 other)
 
 Vector3 Matrix3::operator *(Vector3 other)
 {
-	float vec[3];
+	GEOMfloat vec[3];
 
 	for (int i = 0; i < 3; i++)
 		vec[i] = other[0] * this->elements[i] +
@@ -217,14 +217,14 @@ Vector3 Matrix3::operator *(Vector3 other)
 	return Vector3(vec);
 }
 
-float& Matrix3::operator[] (const int index)
+GEOMfloat& Matrix3::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-Matrix3 operator *(Matrix3 mat, float right)
+Matrix3 operator *(Matrix3 mat, GEOMfloat right)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i++)
 		result[i] = mat[i] * right;
@@ -232,9 +232,9 @@ Matrix3 operator *(Matrix3 mat, float right)
 	return Matrix3(result);
 }
 
-Matrix3 operator *(float left, Matrix3 mat)
+Matrix3 operator *(GEOMfloat left, Matrix3 mat)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i++)
 		result[i] = mat[i] * left;
@@ -242,9 +242,9 @@ Matrix3 operator *(float left, Matrix3 mat)
 	return Matrix3(result);
 }
 
-Matrix3 operator /(Matrix3 mat, float right)
+Matrix3 operator /(Matrix3 mat, GEOMfloat right)
 {
-	float result[9];
+	GEOMfloat result[9];
 
 	for (int i = 0; i < 9; i++)
 		result[i] = mat[i] / right;
@@ -258,13 +258,13 @@ Matrix3 operator /(Matrix3 mat, float right)
 
 #pragma region class Matrix2
 
-Matrix2::Matrix2(float matrix[4])
+Matrix2::Matrix2(GEOMfloat matrix[4])
 {
 	for (int i = 0; i < 4; i++)
 		this->elements[i] = matrix[i];
 }
 
-Matrix2::Matrix2(float a11, float a12, float a21, float a22)
+Matrix2::Matrix2(GEOMfloat a11, GEOMfloat a12, GEOMfloat a21, GEOMfloat a22)
 {
 	this->elements[0] = a11;
 	this->elements[1] = a12;
@@ -286,7 +286,7 @@ void Matrix2::show()
 
 Matrix2 Matrix2::operator +(Matrix2 other)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i++)
 		result[i] = this->elements[i] + other[i];
@@ -296,7 +296,7 @@ Matrix2 Matrix2::operator +(Matrix2 other)
 
 Matrix2 Matrix2::operator -(Matrix2 other)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i++)
 		result[i] = this->elements[i] - other[i];
@@ -306,7 +306,7 @@ Matrix2 Matrix2::operator -(Matrix2 other)
 
 Matrix2 Matrix2::operator *(Matrix2 other)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i += 2)
 		for (int j = 0; j < 2; j++)
@@ -318,7 +318,7 @@ Matrix2 Matrix2::operator *(Matrix2 other)
 
 Vector2 Matrix2::operator *(Vector2 other)
 {
-	float vec[2];
+	GEOMfloat vec[2];
 
 	for (int i = 0; i < 2; i++)
 		vec[i] = other[0] * this->elements[i] +
@@ -327,14 +327,14 @@ Vector2 Matrix2::operator *(Vector2 other)
 	return Vector2(vec);
 }
 
-float& Matrix2::operator[] (const int index)
+GEOMfloat& Matrix2::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-Matrix2 operator *(Matrix2 mat, float right)
+Matrix2 operator *(Matrix2 mat, GEOMfloat right)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i++)
 		result[i] = mat[i] * right;
@@ -342,9 +342,9 @@ Matrix2 operator *(Matrix2 mat, float right)
 	return Matrix2(result);
 }
 
-Matrix2 operator *(float left, Matrix2 mat)
+Matrix2 operator *(GEOMfloat left, Matrix2 mat)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i++)
 		result[i] = mat[i] * left;
@@ -352,9 +352,9 @@ Matrix2 operator *(float left, Matrix2 mat)
 	return Matrix2(result);
 }
 
-Matrix2 operator /(Matrix2 mat, float right) 
+Matrix2 operator /(Matrix2 mat, GEOMfloat right)
 {
-	float result[4];
+	GEOMfloat result[4];
 
 	for (int i = 0; i < 4; i++)
 		result[i] = mat[i] / right;
@@ -368,9 +368,9 @@ Matrix2 operator /(Matrix2 mat, float right)
 
 #pragma region Affine transformation matrices
 
-Matrix4 createTranslateMatrix(float x, float y, float z)
+Matrix4 createTranslateMatrix(GEOMfloat x, GEOMfloat y, GEOMfloat z)
 {
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		1.0f, 0.0f, 0.0f, x,
 		0.0f, 1.0f, 0.0f, y,
 		0.0f, 0.0f, 1.0f, z,
@@ -380,9 +380,9 @@ Matrix4 createTranslateMatrix(float x, float y, float z)
 	return Matrix4(mat);
 }
 
-Matrix4 createScaleMatrix(float sx, float sy, float sz)
+Matrix4 createScaleMatrix(GEOMfloat sx, GEOMfloat sy, GEOMfloat sz)
 {
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		sx, 0.0f, 0.0f, 0.0f,
 		0.0f, sy, 0.0f, 0.0f,
 		0.0f, 0.0f, sz, 0.0f,
@@ -392,12 +392,12 @@ Matrix4 createScaleMatrix(float sx, float sy, float sz)
 	return Matrix4(mat);
 }
 
-Matrix4 createRotateXMatrix(float angle)
+Matrix4 createRotateXMatrix(GEOMfloat angle)
 {
-	float c = cos(angle * PI / 180.0f);
-	float s = sin(angle * PI / 180.0f);
+	GEOMfloat c = cos(angle * PI / 180.0f);
+	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, c, -s, 0.0f,
 		0.0f, s, c, 0.0f,
@@ -407,12 +407,12 @@ Matrix4 createRotateXMatrix(float angle)
 	return Matrix4(mat);
 }
 
-Matrix4 createRotateYMatrix(float angle)
+Matrix4 createRotateYMatrix(GEOMfloat angle)
 {
-	float c = cos(angle * PI / 180.0f);
-	float s = sin(angle * PI / 180.0f);
+	GEOMfloat c = cos(angle * PI / 180.0f);
+	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		c, 0.0f, s, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		-s, 0.0f, c, 0.0f,
@@ -422,12 +422,12 @@ Matrix4 createRotateYMatrix(float angle)
 	return Matrix4(mat);
 }
 
-Matrix4 createRotateZMatrix(float angle)
+Matrix4 createRotateZMatrix(GEOMfloat angle)
 {
-	float c = cos(angle * PI / 180.0f);
-	float s = sin(angle * PI / 180.0f);
+	GEOMfloat c = cos(angle * PI / 180.0f);
+	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		c, -s, 0.0f, 0.0f,
 		s, c, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
@@ -437,18 +437,18 @@ Matrix4 createRotateZMatrix(float angle)
 	return Matrix4(mat);
 }
 
-Matrix4 createPerspectiveProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height)
+Matrix4 createPerspectiveProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height)
 {
-	float right, left, bottom, top;
+	GEOMfloat right, left, bottom, top;
 
-	float scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
+	GEOMfloat scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
 
 	right = scale;
 	left = -right;
-	top = ((float)screen_width / (float)screen_height) * scale;
+	top = ((GEOMfloat)screen_width / (GEOMfloat)screen_height) * scale;
 	bottom = -top;
 
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		(2.0f * near) / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, (2.0f * near) / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -(far + near) / (far - near), -(2.0f * far * near) / (far - near),
@@ -458,18 +458,18 @@ Matrix4 createPerspectiveProjectionMatrix(float far, float near, float fov, int 
 	return Matrix4(mat);
 }
 
-Matrix4 createParallelProjectionMatrix(float far, float near, float fov, int screen_width, int screen_height)
+Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height)
 {
-	float right, left, bottom, top;
+	GEOMfloat right, left, bottom, top;
 
-	float scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
+	GEOMfloat scale = tan((fov / 2.0f) * (PI / 180.0f)) * near;
 
 	right = scale;
 	left = -right;
-	top = ((float)screen_width / (float)screen_height) * scale;
+	top = ((GEOMfloat)screen_width / (GEOMfloat)screen_height) * scale;
 	bottom = -top;
 
-	float mat[16] = {
+	GEOMfloat mat[16] = {
 		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
@@ -483,7 +483,7 @@ Matrix4 createParallelProjectionMatrix(float far, float near, float fov, int scr
 
 Matrix3 getMainMinor(Matrix4 mat4)
 {
-	float mat[9] = {
+	GEOMfloat mat[9] = {
 		mat4.elements[0], mat4.elements[1], mat4.elements[2],
 		mat4.elements[4], mat4.elements[5], mat4.elements[6],
 		mat4.elements[8], mat4.elements[9], mat4.elements[10]
@@ -493,7 +493,7 @@ Matrix3 getMainMinor(Matrix4 mat4)
 
 Matrix2 getMainMinor(Matrix3 mat3)
 {
-	float mat[4] = {
+	GEOMfloat mat[4] = {
 		mat3.elements[0], mat3.elements[1],
 		mat3.elements[3], mat3.elements[4]
 	};

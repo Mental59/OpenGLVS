@@ -17,6 +17,9 @@ GLint g_uParams;
 
 GLfloat params[] = { -0.05f, -90.0f, -5.0f };
 int sign = 1;
+GLfloat xAngle = 40.0f;
+GLfloat yAngle = 20.0f;
+GLfloat zAngle = 30.0f;
 
 chrono::time_point<chrono::system_clock> g_callTime;
 
@@ -258,7 +261,7 @@ bool createModel()
 bool init()
 {
     // Set initial color of color buffer to white.
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -272,8 +275,7 @@ void reshape(GLFWwindow *window, int width, int height)
 
 void draw(double delta)
 {
-    cout << "params[1] = " << params[1] << endl;
-   
+
     params[1] += delta * 12.0 * sign;
 
     // Clear color buffer.
@@ -284,21 +286,23 @@ void draw(double delta)
 
     static Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
 
-    static Matrix4 T = createTranslateMatrix(-0.03f, -0.1f, -1.0f);
+    static Matrix4 T = createTranslateMatrix(0.0f, -0.1f, -1.25f);
 
-    static Matrix4 Ry = createRotateYMatrix(20.0f);
+    cout << "Current time: " << glfwGetTime() << endl;
 
-    static Matrix4 Rx = createRotateXMatrix(40.0f);
+    Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
 
-    static Matrix4 Rz = createRotateZMatrix(30.0f);
+    Matrix4 Rx = createRotateXMatrix(xAngle);
 
-    static Matrix4 MV = T * S * Rx * Ry;
+    static Matrix4 Rz = createRotateZMatrix(zAngle);
 
-    static Matrix3 UN = getMainMinor(MV);
+    Matrix4 MV = T * S * Rx * Ry;
+
+    Matrix3 UN = getMainMinor(MV);
 
     static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3);
 
-    static Matrix4 MVP = P * MV;
+    Matrix4 MVP = P * MV;
 
     glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MVP.elements);
     glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);

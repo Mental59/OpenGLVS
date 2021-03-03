@@ -5,7 +5,7 @@
 
 #pragma region Class Vector4
 
-Vector4::Vector4(float x, float y, float z, float w)
+Vector4::Vector4(GEOMfloat x, GEOMfloat y, GEOMfloat z, GEOMfloat w)
 {
 	this->elements[0] = x;
 	this->elements[1] = y;
@@ -13,7 +13,7 @@ Vector4::Vector4(float x, float y, float z, float w)
 	this->elements[3] = w;
 }
 
-Vector4::Vector4(float vector[4])
+Vector4::Vector4(GEOMfloat vector[4])
 {
 	this->elements[0] = vector[0];
 	this->elements[1] = vector[1];
@@ -56,11 +56,11 @@ Vector4 Vector4::operator *(Vector4 other)
 		);
 }
 
-float Vector4::dot(Vector4 a, Vector4 b)
+GEOMfloat Vector4::dot(Vector4 a, Vector4 b)
 {
 	Vector4 p = a * b;
 
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 
 	for (int i = 0; i < 4; i++)
 		res += p[i];
@@ -68,14 +68,14 @@ float Vector4::dot(Vector4 a, Vector4 b)
 	return res;
 }
 
-float& Vector4::operator[] (const int index)
+GEOMfloat& Vector4::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-float Vector4::length()
+GEOMfloat Vector4::length()
 {
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 	for (int i = 0; i < 4; i++)
 		res += elements[i] * elements[i];
 	return sqrt(res);
@@ -83,12 +83,12 @@ float Vector4::length()
 
 void Vector4::normalize()
 {
-	float len = length();
+	GEOMfloat len = length();
 	for (int i = 0; i < 4; i++)
 		elements[i] /= len;
 }
 
-Vector4 operator *(Vector4 vec, float right)
+Vector4 operator *(Vector4 vec, GEOMfloat right)
 {
 	return Vector4(
 		vec[0] * right,
@@ -98,7 +98,7 @@ Vector4 operator *(Vector4 vec, float right)
 	);
 }
 
-Vector4 operator *(float left, Vector4 vec)
+Vector4 operator *(GEOMfloat left, Vector4 vec)
 {
 	return Vector4(
 		vec[0] * left,
@@ -108,7 +108,7 @@ Vector4 operator *(float left, Vector4 vec)
 	);
 }
 
-Vector4 operator /(Vector4 vec, float right)
+Vector4 operator /(Vector4 vec, GEOMfloat right)
 {
 	return Vector4(
 		vec[0] / right,
@@ -124,14 +124,14 @@ Vector4 operator /(Vector4 vec, float right)
 
 #pragma region Class Vector3
 
-Vector3::Vector3(float x, float y, float z)
+Vector3::Vector3(GEOMfloat x, GEOMfloat y, GEOMfloat z)
 {
 	this->elements[0] = x;
 	this->elements[1] = y;
 	this->elements[2] = z;
 }
 
-Vector3::Vector3(float vector[3])
+Vector3::Vector3(GEOMfloat vector[3])
 {
 	this->elements[0] = vector[0];
 	this->elements[1] = vector[1];
@@ -170,11 +170,11 @@ Vector3 Vector3::operator *(Vector3 other)
 		);
 }
 
-float Vector3::dot(Vector3 a, Vector3 b)
+GEOMfloat Vector3::dot(Vector3 a, Vector3 b)
 {
 	Vector3 p = a * b;
 
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 
 	for (int i = 0; i < 3; i++)
 		res += p[i];
@@ -182,14 +182,14 @@ float Vector3::dot(Vector3 a, Vector3 b)
 	return res;
 }
 
-float& Vector3::operator[] (const int index)
+GEOMfloat& Vector3::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-float Vector3::length()
+GEOMfloat Vector3::length()
 {
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 	for (int i = 0; i < 3; i++)
 		res += elements[i] * elements[i];
 	return sqrt(res);
@@ -197,12 +197,12 @@ float Vector3::length()
 
 void Vector3::normalize()
 {
-	float len = length();
+	GEOMfloat len = length();
 	for (int i = 0; i < 3; i++)
 		elements[i] /= len;
 }
 
-Vector3 operator *(Vector3 vec, float right)
+Vector3 operator *(Vector3 vec, GEOMfloat right)
 {
 	return Vector3(
 		vec[0] * right,
@@ -211,7 +211,7 @@ Vector3 operator *(Vector3 vec, float right)
 	);
 }
 
-Vector3 operator *(float left, Vector3 vec)
+Vector3 operator *(GEOMfloat left, Vector3 vec)
 {
 	return Vector3(
 		vec[0] * left,
@@ -220,7 +220,7 @@ Vector3 operator *(float left, Vector3 vec)
 	);
 }
 
-Vector3 operator /(Vector3 vec, float right)
+Vector3 operator /(Vector3 vec, GEOMfloat right)
 {
 	return Vector3(
 		vec[0] / right,
@@ -235,13 +235,13 @@ Vector3 operator /(Vector3 vec, float right)
 
 #pragma region Class Vector2
 
-Vector2::Vector2(float x, float y)
+Vector2::Vector2(GEOMfloat x, GEOMfloat y)
 {
 	this->elements[0] = x;
 	this->elements[1] = y;
 }
 
-Vector2::Vector2(float vector[2])
+Vector2::Vector2(GEOMfloat vector[2])
 {
 	this->elements[0] = vector[0];
 	this->elements[1] = vector[1];
@@ -276,11 +276,11 @@ Vector2 Vector2::operator *(Vector2 other)
 		);
 }
 
-float Vector2::dot(Vector2 a, Vector2 b)
+GEOMfloat Vector2::dot(Vector2 a, Vector2 b)
 {
 	Vector2 p = a * b;
 
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 
 	for (int i = 0; i < 2; i++)
 		res += p[i];
@@ -288,14 +288,14 @@ float Vector2::dot(Vector2 a, Vector2 b)
 	return res;
 }
 
-float& Vector2::operator[] (const int index)
+GEOMfloat& Vector2::operator[] (const int index)
 {
 	return this->elements[index];
 }
 
-float Vector2::length()
+GEOMfloat Vector2::length()
 {
-	float res = 0.0f;
+	GEOMfloat res = 0.0f;
 	for (int i = 0; i < 2; i++)
 		res += elements[i] * elements[i];
 	return sqrt(res);
@@ -303,12 +303,12 @@ float Vector2::length()
 
 void Vector2::normalize()
 {
-	float len = length();
+	GEOMfloat len = length();
 	for (int i = 0; i < 2; i++)
 		elements[i] /= len;
 }
 
-Vector2 operator *(Vector2 vec, float right)
+Vector2 operator *(Vector2 vec, GEOMfloat right)
 {
 	return Vector2(
 		vec[0] * right,
@@ -316,7 +316,7 @@ Vector2 operator *(Vector2 vec, float right)
 	);
 }
 
-Vector2 operator *(float left, Vector2 vec)
+Vector2 operator *(GEOMfloat left, Vector2 vec)
 {
 	return Vector2(
 		vec[0] * left,
@@ -324,7 +324,7 @@ Vector2 operator *(float left, Vector2 vec)
 	);
 }
 
-Vector2 operator /(Vector2 vec, float right)
+Vector2 operator /(Vector2 vec, GEOMfloat right)
 {
 	return Vector2(
 		vec[0] / right,
