@@ -16,7 +16,8 @@ GLint g_uN;
 GLint g_uParams;
 
 GLfloat params[] = { -0.05f, -90.0f, -5.0f };
-int sign = 1;
+int sign1 = 1;
+int sign2 = 1;
 GLfloat xAngle = 40.0f;
 GLfloat yAngle = 20.0f;
 GLfloat zAngle = 30.0f;
@@ -166,7 +167,7 @@ bool createShaderProgram()
     ""
     "void main()"
     "{"
-    "   vec3 color = vec3(0.0, 1.0, 1.0);"
+    "   vec3 color = vec3(0.19, 0.83, 0.78);"
     ""
     "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
@@ -275,8 +276,8 @@ void reshape(GLFWwindow *window, int width, int height)
 
 void draw(double delta)
 {
-
-    params[1] += delta * 12.0 * sign;
+    params[1] += delta * 12.0 * sign1;
+    params[0] += delta * 0.005 * sign2;
 
     // Clear color buffer.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -312,7 +313,9 @@ void draw(double delta)
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 
     if (abs(params[1]) > 90.0)
-        sign *= -1;
+        sign1 *= -1;
+    if (params[0] > 0.0 || params[0] < -0.05)
+        sign2 *= -1;
 }
 
 void cleanup()
