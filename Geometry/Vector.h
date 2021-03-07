@@ -23,7 +23,7 @@ public:
 
 	void show();
 
-	void normalize();
+	static Vector4 normalize(Vector4 a);
 
 	GEOMfloat length();
 
@@ -53,11 +53,13 @@ public:
 
 	static GEOMfloat dot(Vector3 a, Vector3 b);
 
+	static Vector3 cross(Vector3 a, Vector3 b);
+
 	GEOMfloat& operator[] (const int index);
 
 	void show();
 
-	void normalize();
+	static Vector3 normalize(Vector3 a);;
 
 	GEOMfloat length();
 
@@ -91,7 +93,7 @@ public:
 
 	void show();
 
-	void normalize();
+	static Vector2 normalize(Vector2 a);
 
 	GEOMfloat length();
 

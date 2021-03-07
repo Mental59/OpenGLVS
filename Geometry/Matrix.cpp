@@ -370,26 +370,22 @@ Matrix2 operator /(Matrix2 mat, GEOMfloat right)
 
 Matrix4 createTranslateMatrix(GEOMfloat x, GEOMfloat y, GEOMfloat z)
 {
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		1.0f, 0.0f, 0.0f, x,
 		0.0f, 1.0f, 0.0f, y,
 		0.0f, 0.0f, 1.0f, z,
 		0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 Matrix4 createScaleMatrix(GEOMfloat sx, GEOMfloat sy, GEOMfloat sz)
 {
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		sx, 0.0f, 0.0f, 0.0f,
 		0.0f, sy, 0.0f, 0.0f,
 		0.0f, 0.0f, sz, 0.0f,
-		0.0f, 0.0f, 0.0f,  1.0f,
-	};
-
-	return Matrix4(mat);
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
 }
 
 Matrix4 createRotateXMatrix(GEOMfloat angle)
@@ -397,14 +393,12 @@ Matrix4 createRotateXMatrix(GEOMfloat angle)
 	GEOMfloat c = cos(angle * PI / 180.0f);
 	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, c, -s, 0.0f,
 		0.0f, s, c, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 Matrix4 createRotateYMatrix(GEOMfloat angle)
@@ -412,14 +406,12 @@ Matrix4 createRotateYMatrix(GEOMfloat angle)
 	GEOMfloat c = cos(angle * PI / 180.0f);
 	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		c, 0.0f, s, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		-s, 0.0f, c, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 Matrix4 createRotateZMatrix(GEOMfloat angle)
@@ -427,14 +419,12 @@ Matrix4 createRotateZMatrix(GEOMfloat angle)
 	GEOMfloat c = cos(angle * PI / 180.0f);
 	GEOMfloat s = sin(angle * PI / 180.0f);
 
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		c, -s, 0.0f, 0.0f,
 		s, c, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 Matrix4 createPerspectiveProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height)
@@ -448,14 +438,12 @@ Matrix4 createPerspectiveProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMflo
 	top = ((GEOMfloat)screen_width / (GEOMfloat)screen_height) * scale;
 	bottom = -top;
 
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		(2.0f * near) / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, (2.0f * near) / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -(far + near) / (far - near), -(2.0f * far * near) / (far - near),
 		0.0f, 0.0f, -1.0f, 0.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height)
@@ -469,33 +457,48 @@ Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat 
 	top = ((GEOMfloat)screen_width / (GEOMfloat)screen_height) * scale;
 	bottom = -top;
 
-	GEOMfloat mat[16] = {
+	return Matrix4(
 		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
 		0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
 		0.0f, 0.0f, 0.0f, 1.0f
-	};
-
-	return Matrix4(mat);
+	);
 }
 
 #pragma endregion
 
 Matrix3 getMainMinor(Matrix4 mat4)
 {
-	GEOMfloat mat[9] = {
+	return Matrix3(
 		mat4.elements[0], mat4.elements[1], mat4.elements[2],
 		mat4.elements[4], mat4.elements[5], mat4.elements[6],
 		mat4.elements[8], mat4.elements[9], mat4.elements[10]
-	};
-	return Matrix3(mat);
+	);
 }
 
 Matrix2 getMainMinor(Matrix3 mat3)
 {
-	GEOMfloat mat[4] = {
+	return Matrix2(
 		mat3.elements[0], mat3.elements[1],
 		mat3.elements[3], mat3.elements[4]
-	};
-	return Matrix2(mat);
+	);
+}
+
+Matrix4 createLookAtMatrix(Vector3 cameraPos, Vector3 targetPos, Vector3 up)
+{
+	Matrix4 translateMatrix = createTranslateMatrix(-cameraPos[0], -cameraPos[1], -cameraPos[2]);
+
+	Vector3 cameraDirection = Vector3::normalize(cameraPos - targetPos);
+
+	Vector3 cameraRight = Vector3::normalize(Vector3::cross(up, cameraDirection));
+
+	Vector3 cameraUp = Vector3::cross(cameraDirection, cameraRight);
+
+	Matrix4 tempMatrix = Matrix4(
+		cameraRight[0], cameraRight[1], cameraRight[2], 0.0f,
+		cameraUp[0], cameraUp[1], cameraUp[2], 0.0f,
+		cameraDirection[0], cameraDirection[1], cameraDirection[2], 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
+	return tempMatrix * translateMatrix;
 }

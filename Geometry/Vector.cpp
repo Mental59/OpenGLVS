@@ -81,11 +81,18 @@ GEOMfloat Vector4::length()
 	return sqrt(res);
 }
 
-void Vector4::normalize()
+Vector4 Vector4::normalize(Vector4 a)
 {
-	GEOMfloat len = length();
-	for (int i = 0; i < 4; i++)
-		elements[i] /= len;
+	GEOMfloat len = a.length();
+
+	Vector4 res = Vector4(
+		a.elements[0] / len,
+		a.elements[1] / len,
+		a.elements[2] / len,
+		a.elements[3] / len
+	);
+
+	return res;
 }
 
 Vector4 operator *(Vector4 vec, GEOMfloat right)
@@ -182,6 +189,11 @@ GEOMfloat Vector3::dot(Vector3 a, Vector3 b)
 	return res;
 }
 
+Vector3 Vector3::cross(Vector3 a, Vector3 b)
+{
+	return Vector3(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]);
+}
+
 GEOMfloat& Vector3::operator[] (const int index)
 {
 	return this->elements[index];
@@ -195,11 +207,17 @@ GEOMfloat Vector3::length()
 	return sqrt(res);
 }
 
-void Vector3::normalize()
+Vector3 Vector3::normalize(Vector3 a)
 {
-	GEOMfloat len = length();
-	for (int i = 0; i < 3; i++)
-		elements[i] /= len;
+	GEOMfloat len = a.length();
+
+	Vector3 res = Vector3(
+		a.elements[0] / len,
+		a.elements[1] / len,
+		a.elements[2] / len
+	);
+
+	return res;
 }
 
 Vector3 operator *(Vector3 vec, GEOMfloat right)
@@ -301,11 +319,16 @@ GEOMfloat Vector2::length()
 	return sqrt(res);
 }
 
-void Vector2::normalize()
+Vector2 Vector2::normalize(Vector2 a)
 {
-	GEOMfloat len = length();
-	for (int i = 0; i < 2; i++)
-		elements[i] /= len;
+	GEOMfloat len = a.length();
+
+	Vector2 res = Vector2(
+		a.elements[0] / len,
+		a.elements[1] / len
+	);
+
+	return res;
 }
 
 Vector2 operator *(Vector2 vec, GEOMfloat right)

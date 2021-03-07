@@ -108,3 +108,5 @@ Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat 
 
 Matrix3 getMainMinor(Matrix4 mat4);
 Matrix2 getMainMinor(Matrix3 mat3);
+
+Matrix4 createLookAtMatrix(Vector3 cameraPos, Vector3 targetPos, Vector3 up);

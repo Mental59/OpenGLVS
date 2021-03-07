@@ -22,6 +22,12 @@ GLfloat xAngle = 40.0f;
 GLfloat yAngle = 20.0f;
 GLfloat zAngle = 30.0f;
 
+Vector3 cameraPos = Vector3(0.0f, 0.0f, 3.0f);
+Vector3 cameraFront = Vector3(0.0f, 0.0f, -1.0f);
+Vector3 cameraUp = Vector3(0.0f, 1.0f, 0.0f);
+
+bool keys[1024];
+
 chrono::time_point<chrono::system_clock> g_callTime;
 
 class Model
@@ -285,21 +291,23 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    static Matrix4 S = createScaleMatrix(0.5f, 0.5f, 0.5f);
+    static Matrix4 S = createScaleMatrix(1.0f, 1.0f, 1.0f);
 
-    static Matrix4 T = createTranslateMatrix(0.0f, -0.1f, -1.25f);
+    static Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 1.0f);
 
     static Matrix4 Rx = createRotateXMatrix(xAngle);
 
     static Matrix4 Rz = createRotateZMatrix(zAngle);
 
-    static Matrix4 s_MV = T * S * Rx;
+    static Matrix4 M = T * createRotateXMatrix(30.0f);
+
+    //static Matrix4 s_MV = T * S * Rx;
 
     static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3);
 
-    Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
+    //Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
 
-    Matrix4 MV = s_MV * Ry;
+    Matrix4 MV = createLookAtMatrix(cameraPos, cameraPos + cameraFront, cameraUp) * M;
 
     Matrix3 UN = getMainMinor(MV);
 
@@ -382,6 +390,31 @@ void tearDownOpenGL()
     glfwTerminate();
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+
+    if (action == GLFW_PRESS)
+        keys[key] = true;
+    else if (action == GLFW_RELEASE)
+        keys[key] = false;
+}
+
+void do_movement(double deltaTime)
+{
+    // Camera controls
+    GLfloat cameraSpeed = 2.0f * deltaTime;
+    if (keys[GLFW_KEY_W])
+        cameraPos = cameraPos + cameraSpeed * cameraFront;
+    if (keys[GLFW_KEY_S])
+        cameraPos = cameraPos - cameraSpeed * cameraFront;
+    if (keys[GLFW_KEY_A])
+        cameraPos = cameraPos - Vector3::normalize(Vector3::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (keys[GLFW_KEY_D])
+        cameraPos = cameraPos + Vector3::normalize(Vector3::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
 int main()
 {   
     // Initialize OpenGL
@@ -390,6 +423,8 @@ int main()
 
     // Initialize graphical resources.
     bool isOk = init();
+
+    glfwSetKeyCallback(g_window, key_callback);
 
     if (isOk)
     {
@@ -401,13 +436,18 @@ int main()
             chrono::duration<double> elapsed = callTime - g_callTime;
             g_callTime = callTime;
 
-            // Draw scene.
-            draw(elapsed.count());
+            double deltaTime = elapsed.count();
 
-            // Swap buffers.
-            glfwSwapBuffers(g_window);
             // Poll window events.
             glfwPollEvents();
+
+            do_movement(deltaTime);
+
+            // Draw scene.
+            draw(deltaTime);
+
+            // Swap buffers.
+            glfwSwapBuffers(g_window);  
         }
     }
 
