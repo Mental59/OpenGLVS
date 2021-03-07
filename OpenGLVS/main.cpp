@@ -10,9 +10,9 @@ using namespace std;
 GLFWwindow *g_window;
 
 GLuint g_shaderProgram;
-GLint g_uMVP;
-GLint g_uMV;
-GLint g_uN;
+GLint g_uM;
+GLint g_uV;
+GLint g_uP;
 GLint g_uParams;
 
 GLfloat params[] = { -0.05f, -90.0f, -5.0f };
@@ -126,9 +126,9 @@ bool createShaderProgram()
     ""
     "layout(location = 0) in vec2 a_position;"
     ""
-    "uniform mat4 u_mvp;"
-    "uniform mat4 u_mv;"
-    "uniform mat3 u_n;"
+    "uniform mat4 u_m;"
+    "uniform mat4 u_v;"
+    "uniform mat4 u_p;"
     "uniform vec3 u_params;"
     ""
     "out vec3 v_normal;"
@@ -155,11 +155,14 @@ bool createShaderProgram()
     ""
     "void main()"
     "{"
+    "   mat4 mv = u_v * u_m;"
+    "   mat4 mvp = u_p * mv;"
+    ""
     "   float y = f(a_position);"
     "   vec4 p0 = vec4(a_position[0], y, a_position[1], 1.0);"
-    "   v_normal = transpose(inverse(u_n)) * normalize(gradient(a_position));"
-    "   v_pos = vec3(u_mv * p0);"
-    "   gl_Position = u_mvp * p0;"
+    "   v_normal = transpose(inverse(mat3(mv))) * normalize(gradient(a_position));"
+    "   v_pos = vec3(mv * p0);"
+    "   gl_Position = mvp * p0;"
     "}"
     ;
 
@@ -200,9 +203,9 @@ bool createShaderProgram()
 
     g_shaderProgram = createProgram(vertexShader, fragmentShader);
 
-    g_uMVP = glGetUniformLocation(g_shaderProgram, "u_mvp");
-    g_uN = glGetUniformLocation(g_shaderProgram, "u_n");
-    g_uMV = glGetUniformLocation(g_shaderProgram, "u_mv");
+    g_uM = glGetUniformLocation(g_shaderProgram, "u_m");
+    g_uV = glGetUniformLocation(g_shaderProgram, "u_v");
+    g_uP = glGetUniformLocation(g_shaderProgram, "u_p");
     g_uParams = glGetUniformLocation(g_shaderProgram, "u_params");
 
     glDeleteShader(vertexShader);
@@ -213,7 +216,7 @@ bool createShaderProgram()
 
 bool createModel()
 {
-    const int n = 2000;
+    const int n = 1000;
 
     GLfloat* vertices = createMesh(n);
 
@@ -291,31 +294,20 @@ void draw(double delta)
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
 
-    static Matrix4 S = createScaleMatrix(1.0f, 1.0f, 1.0f);
+    static Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
 
-    static Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 1.0f);
+    static Matrix4 Rx = createRotateXMatrix(45.0f);
 
-    static Matrix4 Rx = createRotateXMatrix(xAngle);
+    static Matrix4 M = Rx; // Model matrix
 
-    static Matrix4 Rz = createRotateZMatrix(zAngle);
+    Matrix4 V = createLookAtMatrix(cameraPos, cameraPos + cameraFront, cameraUp); // View matrix
 
-    static Matrix4 M = T * createRotateXMatrix(30.0f);
+    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3); // Projection matrix
 
-    //static Matrix4 s_MV = T * S * Rx;
-
-    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3);
-
-    //Matrix4 Ry = createRotateYMatrix(glfwGetTime() * 15.0f);
-
-    Matrix4 MV = createLookAtMatrix(cameraPos, cameraPos + cameraFront, cameraUp) * M;
-
-    Matrix3 UN = getMainMinor(MV);
-
-    Matrix4 MVP = P * MV;
-
-    glUniformMatrix4fv(g_uMVP, 1, GL_TRUE, MVP.elements);
-    glUniformMatrix3fv(g_uN, 1, GL_TRUE, UN.elements);
-    glUniformMatrix4fv(g_uMV, 1, GL_TRUE, MV.elements);
+    
+    glUniformMatrix4fv(g_uM, 1, GL_TRUE, M.elements);
+    glUniformMatrix4fv(g_uV, 1, GL_TRUE, V.elements);
+    glUniformMatrix4fv(g_uP, 1, GL_TRUE, P.elements);
     glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
@@ -404,7 +396,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void do_movement(double deltaTime)
 {
     // Camera controls
-    GLfloat cameraSpeed = 2.0f * deltaTime;
+    GLfloat cameraSpeed = 3.0f * deltaTime;
     if (keys[GLFW_KEY_W])
         cameraPos = cameraPos + cameraSpeed * cameraFront;
     if (keys[GLFW_KEY_S])
@@ -430,7 +422,7 @@ int main()
     {
         g_callTime = chrono::system_clock::now();
         // Main loop until window closed or escape pressed.
-        while (glfwGetKey(g_window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(g_window) == 0)
+        while (!glfwWindowShouldClose(g_window))
         {
             auto callTime = chrono::system_clock::now();
             chrono::duration<double> elapsed = callTime - g_callTime;
