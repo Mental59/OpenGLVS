@@ -8,6 +8,11 @@
 using namespace std;
 
 GLFWwindow *g_window;
+int screen_width = 800, screen_height = 600;
+
+GLfloat lastX = screen_width / 2.0f, lastY = screen_height / 2.0f;
+GLfloat yaw = -90.0f, pitch = 0.0f;
+bool firstMouse = true;
 
 GLuint g_shaderProgram;
 GLint g_uM;
@@ -18,9 +23,6 @@ GLint g_uParams;
 GLfloat params[] = { -0.05f, -90.0f, -5.0f };
 int sign1 = 1;
 int sign2 = 1;
-GLfloat xAngle = 40.0f;
-GLfloat yAngle = 20.0f;
-GLfloat zAngle = 30.0f;
 
 Vector3 cameraPos = Vector3(0.0f, 0.0f, 3.0f);
 Vector3 cameraFront = Vector3(0.0f, 0.0f, -1.0f);
@@ -40,6 +42,11 @@ public:
 };
 
 Model g_model;
+
+GLfloat to_radians(GLfloat degrees)
+{
+    return PI / 180.0f * degrees;
+}
 
 GLfloat* createMesh(const int n)
 {
@@ -216,7 +223,7 @@ bool createShaderProgram()
 
 bool createModel()
 {
-    const int n = 1000;
+    const int n = 2000;
 
     GLfloat* vertices = createMesh(n);
 
@@ -296,7 +303,7 @@ void draw(double delta)
 
     static Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
 
-    static Matrix4 Rx = createRotateXMatrix(45.0f);
+    static Matrix4 Rx = createRotateXMatrix(35.0f);
 
     static Matrix4 M = Rx; // Model matrix
 
@@ -305,9 +312,9 @@ void draw(double delta)
     static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3); // Projection matrix
 
     
-    glUniformMatrix4fv(g_uM, 1, GL_TRUE, M.elements);
-    glUniformMatrix4fv(g_uV, 1, GL_TRUE, V.elements);
-    glUniformMatrix4fv(g_uP, 1, GL_TRUE, P.elements);
+    glUniformMatrix4fv(g_uM, 1, GL_FALSE, M.getTransposedElements());
+    glUniformMatrix4fv(g_uV, 1, GL_FALSE, V.getTransposedElements());
+    glUniformMatrix4fv(g_uP, 1, GL_FALSE, P.getTransposedElements());
     glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
@@ -346,7 +353,7 @@ bool initOpenGL()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create window.
-    g_window = glfwCreateWindow(800, 600, "OpenGL Test", NULL, NULL);
+    g_window = glfwCreateWindow(screen_width, screen_height, "OpenGL Test", NULL, NULL);
     if (g_window == NULL)
     {
         cout << "Failed to open GLFW window" << endl;
@@ -405,6 +412,45 @@ void do_movement(double deltaTime)
         cameraPos = cameraPos - Vector3::normalize(Vector3::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (keys[GLFW_KEY_D])
         cameraPos = cameraPos + Vector3::normalize(Vector3::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (keys[GLFW_KEY_Q])
+        cameraPos = cameraPos - cameraUp * cameraSpeed;
+    if (keys[GLFW_KEY_E])
+        cameraPos = cameraPos + cameraUp * cameraSpeed;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos; // Обратный порядок вычитания потому что оконные Y-координаты возрастают с верху вниз 
+    lastX = xpos;
+    lastY = ypos;
+
+    GLfloat sensitivity = 0.075f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    Vector3 front = Vector3(
+        cos(to_radians(yaw)) * cos(to_radians(pitch)),
+        sin(to_radians(pitch)),
+        sin(to_radians(yaw)) * cos(to_radians(pitch))
+    );
+
+    cameraFront = Vector3::normalize(front);
 }
 
 int main()
@@ -417,6 +463,8 @@ int main()
     bool isOk = init();
 
     glfwSetKeyCallback(g_window, key_callback);
+    glfwSetCursorPosCallback(g_window, mouse_callback);
+    glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (isOk)
     {
@@ -439,7 +487,7 @@ int main()
             draw(deltaTime);
 
             // Swap buffers.
-            glfwSwapBuffers(g_window);  
+            glfwSwapBuffers(g_window);
         }
     }
 

@@ -32,6 +32,8 @@ public:
 
 	friend Matrix4 operator /(Matrix4 mat, GEOMfloat right);
 
+	GEOMfloat* getTransposedElements();
+
 };
 
 class Matrix3
@@ -63,6 +65,8 @@ public:
 
 	friend Matrix3 operator /(Matrix3 mat, GEOMfloat right);
 
+	GEOMfloat* getTransposedElements();
+
 };
 
 class Matrix2
@@ -92,6 +96,7 @@ public:
 
 	friend Matrix2 operator /(Matrix2 mat, GEOMfloat right);
 
+	GEOMfloat* getTransposedElements();
 };
 
 Matrix4 createTranslateMatrix(GEOMfloat x, GEOMfloat y, GEOMfloat z);
