@@ -4,6 +4,8 @@
 #include <chrono>
 #include "Matrix.h"
 #include "Vector.h"
+#include <SOIL.h>
+#include <string>
 
 using namespace std;
 
@@ -14,15 +16,21 @@ GLfloat lastX = screen_width / 2.0f, lastY = screen_height / 2.0f;
 GLfloat yaw = -90.0f, pitch = 0.0f;
 bool firstMouse = true;
 
+const GLsizei g_textureNumber = 2;
 GLuint g_shaderProgram;
+GLuint g_texID[g_textureNumber];
+GLint g_mapLocation[g_textureNumber];
+const char* g_filenames[g_textureNumber] = { "water1.jpg", "glass3.jpg" };
+
 GLint g_uM;
 GLint g_uV;
 GLint g_uP;
 GLint g_uParams;
 
-GLfloat params[] = { -0.05f, -90.0f, -5.0f };
-int sign1 = 1;
-int sign2 = 1;
+GLfloat a = -0.05f, b = -80.0f, c = -2.0f;
+GLfloat params[] = { a, b, c };
+int sign1 = b < 0 ? 1 : -1;
+int sign2 = a < 0 ? 1 : -1;
 
 Vector3 cameraPos = Vector3(0.0f, 0.0f, 3.0f);
 Vector3 cameraFront = Vector3(0.0f, 0.0f, -1.0f);
@@ -140,6 +148,7 @@ bool createShaderProgram()
     ""
     "out vec3 v_normal;"
     "out vec3 v_pos;"
+    "out vec2 v_texCoord;"
     ""
     "float f(vec2 p)"
     "{"
@@ -169,6 +178,7 @@ bool createShaderProgram()
     "   vec4 p0 = vec4(a_position[0], y, a_position[1], 1.0);"
     "   v_normal = transpose(inverse(mat3(mv))) * normalize(gradient(a_position));"
     "   v_pos = vec3(mv * p0);"
+    "   v_texCoord = a_position + 0.5;"
     "   gl_Position = mvp * p0;"
     "}"
     ;
@@ -178,12 +188,18 @@ bool createShaderProgram()
     ""
     "in vec3 v_normal;"
     "in vec3 v_pos;"
+    "in vec2 v_texCoord;"
     ""
-    "layout(location = 0) out vec4 o_color;"  
+    "uniform sampler2D u_map1;"
+    "uniform sampler2D u_map2;"
+    ""
+    "layout(location = 0) out vec4 o_color;"
     ""
     "void main()"
     "{"
-    "   vec3 color = vec3(0.19, 0.83, 0.78);"
+    "   vec4 tex1 = texture(u_map1, v_texCoord);"
+    "   vec4 tex2 = texture(u_map2, v_texCoord);"
+    "   vec4 color = mix(sin(tex1 + tex2), tex2, 0.4);"
     ""
     "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
@@ -192,14 +208,14 @@ bool createShaderProgram()
     "   vec3 n = normalize(v_normal);"
     "   vec3 l = normalize(L - v_pos);"
     ""
-    "   float d = max(dot(n, l), 0.1);"
+    "   float d = max(dot(n, l), 0.20);"
     ""
     "   vec3 e = normalize(-v_pos);"
     "   vec3 h = normalize(l + e);"
     ""
     "   float s = pow(max(dot(n, h), 0.0), S);"
     ""
-    "   o_color = vec4(color * d + s * vec3(1.0, 1.0, 1.0), 1.0);"
+    "   o_color = vec4(color * d + s * vec4(1.0, 1.0, 1.0, 1.0));"
     "}"
     ;
 
@@ -221,9 +237,40 @@ bool createShaderProgram()
     return g_shaderProgram != 0;
 }
 
+bool loadTextures(const char* filenames[])
+{
+    GLsizei texW, texH;
+
+    for (int i = 0; i < g_textureNumber; i++)
+    {
+        unsigned char* image = SOIL_load_image(filenames[i], &texW, &texH, 0, SOIL_LOAD_RGBA);
+
+        glGenTextures(1, &g_texID[i]);
+        glBindTexture(GL_TEXTURE_2D, g_texID[i]);
+
+        if (g_texID[i] == 0)
+            return false;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texW, texH, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+        SOIL_free_image_data(image);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        g_mapLocation[i] = glGetUniformLocation(g_shaderProgram, ("u_map" + to_string(i + 1)).c_str());
+
+        if (g_mapLocation[i] == 0)
+            return false;
+    }
+}
+
 bool createModel()
 {
-    const int n = 2000;
+    const int n = 1000;
 
     GLfloat* vertices = createMesh(n);
 
@@ -247,11 +294,8 @@ bool createModel()
         k++;
     }
 
-    for (int i = 0; i < 2 * n * n; i += 2)
-    {
+    for (int i = 0; i < 2 * n * n; i++)
         vertices[i] -= 0.5;
-        vertices[i + 1] -= 0.5;
-    }
 
     glGenVertexArrays(1, &g_model.vao);
     glBindVertexArray(g_model.vao);
@@ -282,7 +326,7 @@ bool init()
 
     glEnable(GL_DEPTH_TEST);
 
-    return createShaderProgram() && createModel();
+    return createShaderProgram() && createModel() && loadTextures(g_filenames);
 }
 
 void reshape(GLFWwindow *window, int width, int height)
@@ -292,7 +336,7 @@ void reshape(GLFWwindow *window, int width, int height)
 
 void draw(double delta)
 {
-    params[1] += delta * 12.0 * sign1;
+    params[1] += delta * 14.0 * sign1;
     params[0] += delta * 0.005 * sign2;
 
     // Clear color buffer.
@@ -300,8 +344,6 @@ void draw(double delta)
 
     glUseProgram(g_shaderProgram);
     glBindVertexArray(g_model.vao);
-
-    static Matrix4 T = createTranslateMatrix(0.0f, 0.0f, 0.0f);
 
     static Matrix4 Rx = createRotateXMatrix(35.0f);
 
@@ -311,7 +353,13 @@ void draw(double delta)
 
     static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3); // Projection matrix
 
-    
+    for (int texUnit = 0; texUnit < g_textureNumber; texUnit++)
+    {
+        glActiveTexture(GL_TEXTURE0 + texUnit);
+        glBindTexture(GL_TEXTURE_2D, g_texID[texUnit]);
+        glUniform1i(g_mapLocation[texUnit], texUnit);
+    }
+
     glUniformMatrix4fv(g_uM, 1, GL_FALSE, M.getTransposedElements());
     glUniformMatrix4fv(g_uV, 1, GL_FALSE, V.getTransposedElements());
     glUniformMatrix4fv(g_uP, 1, GL_FALSE, P.getTransposedElements());
@@ -319,9 +367,9 @@ void draw(double delta)
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 
-    if (abs(params[1]) > 90.0)
+    if (abs(params[1]) > abs(b))
         sign1 *= -1;
-    if (params[0] > 0.0 || params[0] < -0.05)
+    if (params[0] > 0.0 || params[0] < a)
         sign2 *= -1;
 }
 
@@ -335,6 +383,8 @@ void cleanup()
         glDeleteBuffers(1, &g_model.ibo);
     if (g_model.vao != 0)
         glDeleteVertexArrays(1, &g_model.vao);
+
+    glDeleteTextures(g_textureNumber, g_texID);
 }
 
 bool initOpenGL()
@@ -462,12 +512,12 @@ int main()
     // Initialize graphical resources.
     bool isOk = init();
 
-    glfwSetKeyCallback(g_window, key_callback);
-    glfwSetCursorPosCallback(g_window, mouse_callback);
-    glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     if (isOk)
     {
+        glfwSetKeyCallback(g_window, key_callback);
+        glfwSetCursorPosCallback(g_window, mouse_callback);
+        glfwSetInputMode(g_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         g_callTime = chrono::system_clock::now();
         // Main loop until window closed or escape pressed.
         while (!glfwWindowShouldClose(g_window))
