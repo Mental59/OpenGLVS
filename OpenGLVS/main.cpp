@@ -302,6 +302,8 @@ bool loadTextures(const char* filenames[])
         }
             
     }
+
+    return true;
 }
 
 bool createModel()
