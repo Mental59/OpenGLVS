@@ -22,9 +22,9 @@ GLuint g_texID[g_textureNumber];
 GLint g_mapLocation[g_textureNumber];
 const char* g_filenames[g_textureNumber] = { "water1.jpg", "glass3.jpg" };
 
-GLint g_uM;
-GLint g_uV;
-GLint g_uP;
+GLint g_uMVP;
+GLint g_uMV;
+GLint g_uN;
 GLint g_uParams;
 
 GLfloat a = -0.05f, b = -80.0f, c = -2.0f;
@@ -39,6 +39,8 @@ Vector3 cameraUp = Vector3(0.0f, 1.0f, 0.0f);
 bool keys[1024];
 
 chrono::time_point<chrono::system_clock> g_callTime;
+
+Matrix4 g_P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, screen_width, screen_height);
 
 class Model
 {
@@ -141,9 +143,9 @@ bool createShaderProgram()
     ""
     "layout(location = 0) in vec2 a_position;"
     ""
-    "uniform mat4 u_m;"
-    "uniform mat4 u_v;"
-    "uniform mat4 u_p;"
+    "uniform mat4 u_mvp;"
+    "uniform mat4 u_mv;"
+    "uniform mat3 u_n;"
     "uniform vec3 u_params;"
     ""
     "out vec3 v_normal;"
@@ -171,15 +173,12 @@ bool createShaderProgram()
     ""
     "void main()"
     "{"
-    "   mat4 mv = u_v * u_m;"
-    "   mat4 mvp = u_p * mv;"
-    ""
     "   float y = f(a_position);"
     "   vec4 p0 = vec4(a_position[0], y, a_position[1], 1.0);"
-    "   v_normal = transpose(inverse(mat3(mv))) * normalize(gradient(a_position));"
-    "   v_pos = vec3(mv * p0);"
+    "   v_normal = transpose(inverse(u_n)) * normalize(gradient(a_position));"
+    "   v_pos = vec3(u_mv * p0);"
     "   v_texCoord = a_position + 0.5;"
-    "   gl_Position = mvp * p0;"
+    "   gl_Position = u_mvp * p0;"
     "}"
     ;
 
@@ -226,15 +225,43 @@ bool createShaderProgram()
 
     g_shaderProgram = createProgram(vertexShader, fragmentShader);
 
-    g_uM = glGetUniformLocation(g_shaderProgram, "u_m");
-    g_uV = glGetUniformLocation(g_shaderProgram, "u_v");
-    g_uP = glGetUniformLocation(g_shaderProgram, "u_p");
-    g_uParams = glGetUniformLocation(g_shaderProgram, "u_params");
+    bool uniformsLocated = true;
+
+    string u_mvpName = "u_mvp";
+    string u_mvName = "u_mv";
+    string u_nName = "u_n";
+    string u_paramsName = "u_params";
+
+    g_uMVP = glGetUniformLocation(g_shaderProgram, u_mvpName.c_str());
+    g_uMV = glGetUniformLocation(g_shaderProgram, u_mvName.c_str());
+    g_uN = glGetUniformLocation(g_shaderProgram, u_nName.c_str());
+    g_uParams = glGetUniformLocation(g_shaderProgram, u_paramsName.c_str());
+
+    if (g_uMVP == -1)
+    {
+        cout << u_mvpName << " does not correspond to an active uniform variable in shader program" << endl;
+        uniformsLocated = false;
+    }
+    if (g_uMV == -1)
+    {
+        cout << u_mvpName << " does not correspond to an active uniform variable in shader program" << endl;
+        uniformsLocated = false;
+    }
+    if (g_uN == -1)
+    {
+        cout << u_mvpName << " does not correspond to an active uniform variable in shader program" << endl;
+        uniformsLocated = false;
+    }
+    if (g_uParams == -1)
+    {
+        cout << u_mvpName << " does not correspond to an active uniform variable in shader program" << endl;
+        uniformsLocated = false;
+    }
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    return g_shaderProgram != 0;
+    return g_shaderProgram != 0 && uniformsLocated;
 }
 
 bool loadTextures(const char* filenames[])
@@ -249,8 +276,11 @@ bool loadTextures(const char* filenames[])
         glBindTexture(GL_TEXTURE_2D, g_texID[i]);
 
         if (g_texID[i] == 0)
+        {
+            cout << "Failed to generate texture #" << i << endl;
             return false;
-
+        }
+            
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texW, texH, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 
         SOIL_free_image_data(image);
@@ -261,10 +291,16 @@ bool loadTextures(const char* filenames[])
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        g_mapLocation[i] = glGetUniformLocation(g_shaderProgram, ("u_map" + to_string(i + 1)).c_str());
+        string mapName = "u_map" + to_string(i + 1);
 
-        if (g_mapLocation[i] == 0)
+        g_mapLocation[i] = glGetUniformLocation(g_shaderProgram, mapName.c_str());
+
+        if (g_mapLocation[i] == -1)
+        {
+            cout << mapName << " does not correspond to an active uniform variable in shader program" << endl;
             return false;
+        }
+            
     }
 }
 
@@ -332,6 +368,8 @@ bool init()
 void reshape(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+
+    g_P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, width, height);
 }
 
 void draw(double delta)
@@ -351,7 +389,9 @@ void draw(double delta)
 
     Matrix4 V = createLookAtMatrix(cameraPos, cameraPos + cameraFront, cameraUp); // View matrix
 
-    static Matrix4 P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, 4, 3); // Projection matrix
+    Matrix4 MV = V * M;
+    Matrix4 MVP = g_P * MV;
+    Matrix3 N = getMainMinor(MV);
 
     for (int texUnit = 0; texUnit < g_textureNumber; texUnit++)
     {
@@ -360,9 +400,9 @@ void draw(double delta)
         glUniform1i(g_mapLocation[texUnit], texUnit);
     }
 
-    glUniformMatrix4fv(g_uM, 1, GL_FALSE, M.getTransposedElements());
-    glUniformMatrix4fv(g_uV, 1, GL_FALSE, V.getTransposedElements());
-    glUniformMatrix4fv(g_uP, 1, GL_FALSE, P.getTransposedElements());
+    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, MVP.getTransposedElements());
+    glUniformMatrix4fv(g_uMV, 1, GL_FALSE, MV.getTransposedElements());
+    glUniformMatrix3fv(g_uN, 1, GL_FALSE, N.getTransposedElements());
     glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
@@ -384,7 +424,9 @@ void cleanup()
     if (g_model.vao != 0)
         glDeleteVertexArrays(1, &g_model.vao);
 
-    glDeleteTextures(g_textureNumber, g_texID);
+    for (int i = 0; i < g_textureNumber; i++)
+        if (g_texID[i] != 0)
+            glDeleteTextures(1, &g_texID[i]);
 }
 
 bool initOpenGL()
