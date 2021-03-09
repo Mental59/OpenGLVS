@@ -26,7 +26,6 @@ GLint g_uMVP;
 GLint g_uMV;
 GLint g_uN;
 GLint g_uParams;
-GLint g_uE;
 
 GLfloat a = -0.05f, b = -80.0f, c = -2.0f;
 GLfloat params[] = { a, b, c };
@@ -192,7 +191,6 @@ bool createShaderProgram()
     ""
     "uniform sampler2D u_map1;"
     "uniform sampler2D u_map2;"
-    "uniform vec3 u_E;"
     ""
     "layout(location = 0) out vec4 o_color;"
     ""
@@ -202,7 +200,7 @@ bool createShaderProgram()
     "   vec4 tex2 = texture(u_map2, v_texCoord);"
     "   vec4 color = mix(sin(tex1 + tex2), tex2, 0.4);"
     ""
-    "   vec3 E = u_E;"
+    "   vec3 E = vec3(0.0, 0.0, 0.0);"
     "   vec3 L = vec3(5.0, 5.0, 0.0);"
     "   float S = 90.0;"
     ""
@@ -233,13 +231,11 @@ bool createShaderProgram()
     string u_mvName = "u_mv";
     string u_nName = "u_n";
     string u_paramsName = "u_params";
-    string u_eName = "u_E";
 
     g_uMVP = glGetUniformLocation(g_shaderProgram, u_mvpName.c_str());
     g_uMV = glGetUniformLocation(g_shaderProgram, u_mvName.c_str());
     g_uN = glGetUniformLocation(g_shaderProgram, u_nName.c_str());
     g_uParams = glGetUniformLocation(g_shaderProgram, u_paramsName.c_str());
-    g_uE = glGetUniformLocation(g_shaderProgram, u_eName.c_str());
 
     if (g_uMVP == -1)
     {
@@ -259,11 +255,6 @@ bool createShaderProgram()
     if (g_uParams == -1)
     {
         cout << u_paramsName << " does not correspond to an active uniform variable in shader program" << endl;
-        uniformsLocated = false;
-    }
-    if (g_uE == -1)
-    {
-        cout << u_eName << " does not correspond to an active uniform variable in shader program" << endl;
         uniformsLocated = false;
     }
 
@@ -413,7 +404,6 @@ void draw(double delta)
     glUniformMatrix4fv(g_uMV, 1, GL_FALSE, MV.getTransposedElements());
     glUniformMatrix3fv(g_uN, 1, GL_FALSE, N.getTransposedElements());
     glUniform3fv(g_uParams, 1, params);
-    glUniform3fv(g_uE, 1, cameraPos.elements);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
 
