@@ -10,7 +10,7 @@
 using namespace std;
 
 GLFWwindow *g_window;
-int screen_width = 800, screen_height = 600;
+int screen_width = 1024, screen_height = 768;
 
 GLfloat lastX = screen_width / 2.0f, lastY = screen_height / 2.0f;
 GLfloat yaw = -90.0f, pitch = 0.0f;
@@ -61,18 +61,14 @@ GLfloat to_radians(GLfloat degrees)
 GLfloat* createMesh(const int n)
 {
     GLfloat* mesh = new GLfloat[2 * n * n];
-    GLfloat k2 = 0;
 
-    for (int i = 0; i < 2 * n * n; i += 2 * n)
+    for (int i = 0, k2 = 0; i < 2 * n * n; i += 2 * n, k2++)
     {
-        GLfloat k1 = 0;
-        for (int j = 0; j < 2 * n; j+=2)
+        for (int j = 0, k1 = 0; j < 2 * n; j+=2, k1++)
         {
             mesh[i + j] = k1;
             mesh[i + j + 1] = k2;
-            k1 += 1.0f / (GLfloat)(n - 1);
         }
-        k2 += 1.0f / (GLfloat)(n - 1);
     }
 
     return mesh;
@@ -314,10 +310,9 @@ bool createModel()
 
     GLuint* indices = new GLuint[indices_size];
 
-    int k = 0;
-    for (int i = 0; i < indices_size; )
+    for (int i = 0 , k = 0; i < indices_size; k++)
     {
-        for (int count = 0; count < n - 1; count++, i += 6)
+        for (int count = 0; count < n - 1; count++, i += 6, k++)
         {
             indices[i] = k;
             indices[i + 1] = k + n;
@@ -325,13 +320,11 @@ bool createModel()
             indices[i + 3] = k + n;
             indices[i + 4] = k + n + 1;
             indices[i + 5] = k + 1;
-            k++;
         }
-        k++;
     }
 
     for (int i = 0; i < 2 * n * n; i++)
-        vertices[i] -= 0.5;
+        vertices[i] = vertices[i] / (n - 1) - 0.5f;
 
     glGenVertexArrays(1, &g_model.vao);
     glBindVertexArray(g_model.vao);
@@ -547,6 +540,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 int main()
 {   
+
     // Initialize OpenGL
     if (!initOpenGL())
         return -1;
