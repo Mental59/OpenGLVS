@@ -10,7 +10,7 @@
 using namespace std;
 
 GLFWwindow *g_window;
-int screen_width = 1024, screen_height = 768;
+int screen_width = 800, screen_height = 600;
 
 GLfloat lastX = screen_width / 2.0f, lastY = screen_height / 2.0f;
 GLfloat yaw = -90.0f, pitch = 0.0f;
@@ -64,7 +64,7 @@ GLfloat* createMesh(const int n)
 
     for (int i = 0, k2 = 0; i < 2 * n * n; i += 2 * n, k2++)
     {
-        for (int j = 0, k1 = 0; j < 2 * n; j+=2, k1++)
+        for (int j = 0, k1 = 0; j < 2 * n; j += 2, k1++)
         {
             mesh[i + j] = k1;
             mesh[i + j + 1] = k2;
@@ -210,7 +210,7 @@ bool createShaderProgram()
     ""
     "   float s = pow(max(dot(n, h), 0.0), S);"
     ""
-    "   o_color = vec4(color * d + s * vec4(1.0, 1.0, 1.0, 1.0));"
+    "   o_color = color * d + s * vec4(1.0, 1.0, 1.0, 1.0);"
     "}"
     ;
 
@@ -302,7 +302,7 @@ bool loadTextures(const char* filenames[])
 
 bool createModel()
 {
-    const int n = 1000;
+    const int n = 150;
 
     GLfloat* vertices = createMesh(n);
 
@@ -310,7 +310,7 @@ bool createModel()
 
     GLuint* indices = new GLuint[indices_size];
 
-    for (int i = 0 , k = 0; i < indices_size; k++)
+    for (int i = 0, k = 0; i < indices_size; k++)
     {
         for (int count = 0; count < n - 1; count++, i += 6, k++)
         {
@@ -521,7 +521,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    yaw += xoffset;
+    yaw = fmodf(yaw + xoffset, 360.0f);
     pitch += yoffset;
 
     if (pitch > 89.0f)
@@ -539,7 +539,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 int main()
-{   
+{
 
     // Initialize OpenGL
     if (!initOpenGL())
