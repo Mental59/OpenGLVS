@@ -34,16 +34,14 @@ Matrix4::Matrix4(GEOMfloat a11, GEOMfloat a12, GEOMfloat a13, GEOMfloat a14,
 	this->elements[15] = a44;
 }
 
-GEOMfloat* Matrix4::getTransposedElements()
+Matrix4 Matrix4::transposed()
 {
-	GEOMfloat res[16] = {
+	return Matrix4({
 		this->elements[0], this->elements[4], this->elements[8], this->elements[12],
 		this->elements[1], this->elements[5], this->elements[9], this->elements[13],
 		this->elements[2], this->elements[6], this->elements[10], this->elements[14],
 		this->elements[3], this->elements[7], this->elements[11], this->elements[15]
-	};
-
-	return res;
+		});
 }
 
 void Matrix4::show()
@@ -169,16 +167,16 @@ Matrix3::Matrix3(GEOMfloat a11, GEOMfloat a12, GEOMfloat a13,
 	this->elements[8] = a33;
 }
 
-GEOMfloat* Matrix3::getTransposedElements()
+Matrix3 Matrix3::transposed()
 {
-	GEOMfloat res[9] = {
+	return Matrix3({
 		this->elements[0], this->elements[3], this->elements[6],
 		this->elements[1], this->elements[4], this->elements[7],
 		this->elements[2], this->elements[5], this->elements[8]
-	};
-
-	return res;
+		});
 }
+
+
 
 void Matrix3::show()
 {
@@ -293,14 +291,12 @@ Matrix2::Matrix2(GEOMfloat a11, GEOMfloat a12, GEOMfloat a21, GEOMfloat a22)
 	this->elements[3] = a22;
 }
 
-GEOMfloat* Matrix2::getTransposedElements()
+Matrix2 Matrix2::transposed()
 {
-	GEOMfloat res[4] = {
+	return Matrix2({
 		this->elements[0], this->elements[2],
 		this->elements[1], this->elements[3]
-	};
-
-	return res;
+		});
 }
 
 void Matrix2::show()

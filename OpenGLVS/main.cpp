@@ -393,9 +393,9 @@ void draw(double delta)
         glUniform1i(g_mapLocation[texUnit], texUnit);
     }
 
-    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, MVP.getTransposedElements());
-    glUniformMatrix4fv(g_uMV, 1, GL_FALSE, MV.getTransposedElements());
-    glUniformMatrix3fv(g_uN, 1, GL_FALSE, N.getTransposedElements());
+    glUniformMatrix4fv(g_uMVP, 1, GL_FALSE, MVP.transposed().elements);
+    glUniformMatrix4fv(g_uMV, 1, GL_FALSE, MV.transposed().elements);
+    glUniformMatrix3fv(g_uN, 1, GL_FALSE, N.transposed().elements);
     glUniform3fv(g_uParams, 1, params);
 
     glDrawElements(GL_TRIANGLES, g_model.indexCount, GL_UNSIGNED_INT, NULL);
