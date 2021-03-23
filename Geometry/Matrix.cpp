@@ -487,8 +487,8 @@ Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat 
 	return Matrix4(
 		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
-		0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
-		0.0f, 0.0f, 0.0f, 1.0f
+		0.0f, 0.0f, -2.0f / (far - near), 0.0f,
+		0.0f, 0.0f, -(far + near) / (far - near), 1.0f
 	);
 }
 
@@ -528,4 +528,23 @@ Matrix4 createLookAtMatrix(Vector3 cameraPos, Vector3 targetPos, Vector3 up)
 		0.0f, 0.0f, 0.0f, 1.0f
 	);
 	return tempMatrix * translateMatrix;
+}
+
+Matrix4 createRotateMatrix(Vector3 v, GEOMfloat angle)
+{
+	GEOMfloat c = cos(angle * PI / 180.0f);
+	GEOMfloat s = sin(angle * PI / 180.0f);
+
+	v = Vector3::normalize(v);
+
+	GEOMfloat x = v[0], y = v[1], z = v[2];
+
+	GEOMfloat c1 = 1.0f - c;
+
+	return Matrix4(
+		x * x * c1 + c, x * y * c1 - z * s, x * z * c1 + y * s, 0.0f,
+		y * x * c1 + z * s, y * y * c1 + c, y * z * c1 - x * s, 0.0f,
+		x * z * c1 - y * s, y * z * c1 + x * s, z * z * c1 + c, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	);
 }

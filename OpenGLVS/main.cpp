@@ -40,7 +40,7 @@ bool keys[1024];
 
 chrono::time_point<chrono::system_clock> g_callTime;
 
-Matrix4 g_P = createPerspectiveProjectionMatrix(100.0f, 0.01f, 40.0f, screen_width, screen_height); // Projection matrix
+Matrix4 g_P = createPerspectiveProjectionMatrix(100.0f, 0.1f, 40.0f, screen_width, screen_height); // Projection matrix
 
 class Model
 {
@@ -233,7 +233,7 @@ bool createShaderProgram()
     g_uN = glGetUniformLocation(g_shaderProgram, u_nName.c_str());
     g_uParams = glGetUniformLocation(g_shaderProgram, u_paramsName.c_str());
 
-    if (g_uMVP == -1)
+    /*if (g_uMVP == -1)
     {
         cout << u_mvpName << " does not correspond to an active uniform variable in shader program" << endl;
         uniformsLocated = false;
@@ -252,7 +252,7 @@ bool createShaderProgram()
     {
         cout << u_paramsName << " does not correspond to an active uniform variable in shader program" << endl;
         uniformsLocated = false;
-    }
+    }*/
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -291,18 +291,18 @@ bool loadTextures(const char* filenames[])
 
         g_mapLocation[i] = glGetUniformLocation(g_shaderProgram, mapName.c_str());
 
-        if (g_mapLocation[i] == -1)
+        /*if (g_mapLocation[i] == -1)
         {
             cout << mapName << " does not correspond to an active uniform variable in shader program" << endl;
             return false;
-        }          
+        } */         
     }
     return true;
 }
 
 bool createModel()
 {
-    const int n = 150;
+    const int n = 1000;
 
     GLfloat* vertices = createMesh(n);
 
@@ -378,7 +378,9 @@ void draw(double delta)
 
     static Matrix4 Rx = createRotateXMatrix(35.0f);
 
-    static Matrix4 M = Rx; // Model matrix
+    static Matrix4 R = createRotateMatrix(Vector3(1.0f, 1.0f, 0.0f), 60.0f);
+
+    static Matrix4 M = R; // Model matrix
 
     Matrix4 V = createLookAtMatrix(cameraPos, cameraPos + cameraFront, cameraUp); // View matrix
 

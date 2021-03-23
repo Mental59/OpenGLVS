@@ -107,6 +107,8 @@ Matrix4 createRotateXMatrix(GEOMfloat angle);
 Matrix4 createRotateYMatrix(GEOMfloat angle);
 Matrix4 createRotateZMatrix(GEOMfloat angle);
 
+Matrix4 createRotateMatrix(Vector3 v, GEOMfloat angle);
+
 Matrix4 createPerspectiveProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height);
 
 Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat fov, int screen_width, int screen_height);
