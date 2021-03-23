@@ -95,12 +95,17 @@ Matrix4 Matrix4::operator *(Matrix4 other)
 Vector4 Matrix4::operator *(Vector4 other)
 {
 	GEOMfloat vec[4];
+	int k = 0;
 
 	for (int i = 0; i < 4; i++)
-		vec[i] = other[0] * this->elements[i] +
-		other[1] * this->elements[i + 4] +
-		other[2] * this->elements[i + 8] +
-		other[3] * this->elements[i + 12];
+	{
+		vec[i] = other[0] * this->elements[k] +
+			other[1] * this->elements[k + 1] +
+			other[2] * this->elements[k + 2] +
+			other[3] * this->elements[k + 3];
+		k += 4;
+	}
+		
 
 	return Vector4(vec);
 }
@@ -227,11 +232,16 @@ Matrix3 Matrix3::operator *(Matrix3 other)
 Vector3 Matrix3::operator *(Vector3 other)
 {
 	GEOMfloat vec[3];
+	int k = 0;
 
 	for (int i = 0; i < 3; i++)
-		vec[i] = other[0] * this->elements[i] +
-		other[1] * this->elements[i + 3] +
-		other[2] * this->elements[i + 6];
+	{
+		vec[i] = other[0] * this->elements[k] +
+			other[1] * this->elements[k + 1] +
+			other[2] * this->elements[k + 2];
+		k += 3;
+	}
+
 
 	return Vector3(vec);
 }
@@ -346,10 +356,15 @@ Matrix2 Matrix2::operator *(Matrix2 other)
 Vector2 Matrix2::operator *(Vector2 other)
 {
 	GEOMfloat vec[2];
+	int k = 0;
 
 	for (int i = 0; i < 2; i++)
-		vec[i] = other[0] * this->elements[i] +
-		other[1] * this->elements[i + 2];
+	{
+		vec[i] = other[0] * this->elements[k] +
+			other[1] * this->elements[k + 1];
+		k += 2;
+	}
+
 
 	return Vector2(vec);
 }
@@ -487,8 +502,8 @@ Matrix4 createParallelProjectionMatrix(GEOMfloat far, GEOMfloat near, GEOMfloat 
 	return Matrix4(
 		2.0f / (right - left), 0.0f, 0.0f, 0.0f,
 		0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
-		0.0f, 0.0f, -2.0f / (far - near), 0.0f,
-		0.0f, 0.0f, -(far + near) / (far - near), 1.0f
+		0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
+		0.0f, 0.0f, 0.0f, 1.0f
 	);
 }
 
